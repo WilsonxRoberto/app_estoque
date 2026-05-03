@@ -1,679 +1,471 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
   <title>Controle de Estoque</title>
   <style>
-:root{
-  --bg:#f3f4f6;
-  --panel:#ffffff;
-  --ink:#111827;
-  --muted:#6b7280;
-  --line:#e5e7eb;
-  --brand:#111827;
-  --brand2:#374151;
-  --ok:#047857;
-  --warn:#b45309;
-  --bad:#b91c1c;
-  --blue:#1d4ed8;
-  --soft:#f9fafb;
-  --radius:18px;
-  --shadow:0 14px 35px rgba(17,24,39,.10);
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-body{padding-bottom:98px}
-button,input,select,textarea{font:inherit}
-.app-header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:18px 16px;border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:var(--shadow)}
-.header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-h1{font-size:22px;margin:0;letter-spacing:-.02em}
-h2{font-size:18px;margin:0 0 8px}
-p{margin:0}
-#headerStatus{opacity:.84;font-size:13px;margin-top:4px;line-height:1.35}
-.header-btn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;border-radius:14px;padding:11px 13px;font-weight:900;cursor:pointer;white-space:nowrap}
-.wrap{max-width:1180px;margin:0 auto;padding:14px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
-.card,.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
-.stat b{display:block;font-size:25px;line-height:1.05}
-.stat span{font-size:12px;color:var(--muted)}
-.screen{display:none}.screen.active{display:block}
-.toolbar{display:grid;grid-template-columns:1fr 260px;gap:10px;margin:12px 0}
-.field{width:100%;border:1px solid var(--line);border-radius:15px;padding:13px;font-size:16px;background:#fff;outline:none;color:var(--ink)}
-textarea.field{min-height:78px;resize:vertical}
-.field:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.10)}
-.form{display:grid;gap:10px;margin-top:12px}.form label{font-size:12px;color:var(--muted);font-weight:900}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.btn{border:0;border-radius:14px;padding:12px 14px;font-weight:950;font-size:14px;cursor:pointer;background:#111827;color:#fff;min-height:46px}.btn.secondary{background:#e5e7eb;color:#111827}.btn.ok{background:var(--ok)}.btn.warn{background:var(--warn)}.btn.bad{background:var(--bad)}.btn.blue{background:var(--blue)}.btn.ghost{background:#fff;color:#111827;border:1px solid var(--line)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin:8px 0 10px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-weight:900;font-size:13px;white-space:nowrap;cursor:pointer}.chip.active{background:#111827;color:#fff;border-color:#111827}
-.list{display:grid;gap:10px;margin-top:12px}.list.compact{gap:8px}.item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.item.zero{border-color:#fecaca;background:#fff7f7}.item.low{border-color:#fed7aa;background:#fffaf3}.item.extra{border-color:#bfdbfe;background:#eff6ff}.name{font-weight:950;line-height:1.22}.code{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}.qty{font-size:24px;font-weight:950;text-align:right}.qty small{display:block;font-size:11px;color:var(--muted);font-weight:850;margin-top:2px}.actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.actions .btn{min-height:40px;padding:9px 11px;font-size:13px}
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;margin-top:7px;border:1px solid var(--line);background:#f9fafb}.badge.ok{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.badge.low{background:#fffbeb;color:#92400e;border-color:#fde68a}.badge.zero{background:#fef2f2;color:#991b1b;border-color:#fecaca}.badge.extra{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}.metaRow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.empty{text-align:center;color:var(--muted);padding:28px 10px;background:#fff;border:1px dashed var(--line);border-radius:18px}.alert{padding:12px;border-radius:14px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;font-weight:780;font-size:13px;line-height:1.45;margin-bottom:10px}.alert.success{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.alert.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca}.hint{font-size:13px;color:var(--muted);line-height:1.5}.mt{margin-top:12px}.codebox{padding:12px;background:#111827;color:#f9fafb;border-radius:14px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;margin-top:10px}
-.bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 10px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);z-index:20}.nav{border:0;background:#f3f4f6;color:#111827;border-radius:14px;padding:10px 4px;font-weight:900;font-size:11px;cursor:pointer}.nav.active{background:#111827;color:#fff}
-@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar,.two,.three{grid-template-columns:1fr}.item{grid-template-columns:1fr 86px}.actions .btn{flex:1}.wrap{padding:12px}.header-btn{padding:10px}.bottom-nav{gap:5px}.nav{font-size:10px}h1{font-size:19px}}
-@media print{.app-header,.bottom-nav,.toolbar,.chips,#systemAlert,#btnExportShopping{display:none!important}body{padding:0;background:#fff}.wrap{max-width:none}.screen{display:none}.screen.active{display:block}.card,.item,.stat{box-shadow:none}}
-
+    :root{
+      --bg:#f3f4f6;--panel:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;
+      --brand:#111827;--ok:#047857;--warn:#b45309;--bad:#b91c1c;--blue:#1d4ed8;
+      --radius:18px;--shadow:0 14px 35px rgba(17,24,39,.10)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:92px}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:18px 16px;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:var(--shadow)}
+    .top{max-width:1120px;margin:auto;display:flex;justify-content:space-between;gap:14px;align-items:center}
+    h1{font-size:22px;margin:0}.sub{font-size:13px;opacity:.82;margin-top:4px}.version{font-size:11px;opacity:.75;margin-top:5px}
+    main{max-width:1120px;margin:0 auto;padding:14px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    .grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin:12px 0}.stat b{display:block;font-size:26px}.stat span{font-size:12px;color:var(--muted)}
+    input,select,textarea,button{font:inherit}
+    .input,.select,.textarea{width:100%;border:1px solid var(--line);border-radius:15px;padding:13px 14px;background:#fff;font-size:16px;outline:none}
+    .input:focus,.select:focus,.textarea:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.10)}
+    .textarea{min-height:76px;resize:vertical}
+    .btn{border:0;border-radius:14px;padding:12px 14px;font-weight:900;font-size:14px;cursor:pointer;background:#111827;color:#fff;min-height:46px}
+    .btn.ok{background:var(--ok)}.btn.warn{background:var(--warn)}.btn.bad{background:var(--bad)}.btn.blue{background:var(--blue)}.btn.secondary{background:#e5e7eb;color:#111827}.btn.ghost{background:#fff;color:#111827;border:1px solid var(--line)}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .toolbar{display:grid;grid-template-columns:1fr 220px auto;gap:10px;margin:12px 0}
+    .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);z-index:30}
+    .tab{border:0;background:#f3f4f6;color:#111827;border-radius:14px;padding:10px 6px;font-weight:900;font-size:12px;cursor:pointer}.tab.active{background:#111827;color:#fff}
+    .section{display:none}.section.active{display:block}
+    .chips{display:flex;gap:8px;overflow:auto;margin:10px 0}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-weight:900;font-size:13px;white-space:nowrap;cursor:pointer}.chip.active{background:#111827;color:#fff;border-color:#111827}
+    .list{display:grid;gap:10px;margin-top:12px}
+    .item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:0 8px 18px rgba(17,24,39,.05)}
+    .item.zero{border-color:#fecaca;background:#fff7f7}.item.low{border-color:#fed7aa;background:#fffaf3}.item.extra{border-color:#bfdbfe;background:#eff6ff}
+    .name{font-weight:950;line-height:1.22}.code{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}.qty{font-size:24px;font-weight:950;text-align:right}.qty small{display:block;font-size:11px;color:var(--muted);font-weight:800}
+    .actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.actions .btn{min-height:40px;padding:9px 12px;font-size:13px}
+    .badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;margin:6px 5px 0 0;background:#f9fafb}
+    .badge.ok{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.badge.low{background:#fffbeb;color:#92400e;border-color:#fde68a}.badge.zero{background:#fef2f2;color:#991b1b;border-color:#fecaca}.badge.extra{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}
+    .alert{padding:12px;border-radius:14px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;font-weight:750;font-size:13px;line-height:1.45}.alert.success{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.alert.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+    .hint{font-size:13px;color:var(--muted);line-height:1.5}.empty{text-align:center;color:var(--muted);padding:28px 10px;background:#fff;border:1px dashed var(--line);border-radius:18px}
+    label{font-size:12px;color:var(--muted);font-weight:900;display:block;margin:0 0 5px}.form{display:grid;gap:10px}
+    .loader{display:flex;align-items:center;gap:10px;font-weight:900}.spin{width:18px;height:18px;border-radius:50%;border:3px solid #d1d5db;border-top-color:#111827;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .modal{position:fixed;inset:0;background:rgba(17,24,39,.55);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:14px}.modal.open{display:flex}.modalBox{width:100%;max-width:620px;background:#fff;border-radius:22px;padding:14px;box-shadow:var(--shadow);max-height:92vh;overflow:auto}
+    @media(max-width:760px){h1{font-size:19px}main{padding:12px}.stats{grid-template-columns:repeat(2,1fr)}.toolbar,.row2,.row3{grid-template-columns:1fr}.item{grid-template-columns:1fr 86px}.actions .btn{flex:1}.tabs{grid-template-columns:repeat(5,1fr)}.tab{font-size:11px}.btn{width:100%}}
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <div>
-        <h1>Controle de Estoque</h1>
-        <p id="headerStatus">Carregando base da planilha... • VERSAO FINAL JSONP</p>
-      </div>
-      <button class="header-btn" id="btnReload" type="button">Atualizar</button>
+<header>
+  <div class="top">
+    <div>
+      <h1>Controle de Estoque</h1>
+      <div class="sub">Entrada, saída, cadastro e lista de compras conectados à planilha</div>
+      <div class="version">VERSÃO NOVA LIMPA JSONP • sem fetch/CORS</div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main class="wrap">
-    <div id="systemAlert"></div>
+<main>
+  <div id="statusBox" class="card">
+    <div class="alert">Configure a URL do Apps Script na aba <b>Config</b> e clique em <b>Atualizar</b>.</div>
+  </div>
 
-    <section class="stats" id="stats"></section>
+  <section id="stats" class="grid stats"></section>
 
-    <section id="telaEstoque" class="screen active">
-      <div class="toolbar">
-        <input id="searchStock" class="field" type="search" placeholder="Buscar por código, produto ou setor..." autocomplete="off" />
-        <select id="sectorFilter" class="field"></select>
+  <section id="estoque" class="section active">
+    <div class="toolbar">
+      <input id="search" class="input" placeholder="Buscar produto, código ou setor...">
+      <select id="sector" class="select"></select>
+      <button class="btn blue" onclick="loadData()">Atualizar</button>
+    </div>
+    <div class="chips">
+      <button class="chip active" onclick="setFilter(this,'todos')">Tudo</button>
+      <button class="chip" onclick="setFilter(this,'ok')">OK</button>
+      <button class="chip" onclick="setFilter(this,'baixo')">Baixo</button>
+      <button class="chip" onclick="setFilter(this,'zero')">Zerado</button>
+      <button class="chip" onclick="setFilter(this,'excesso')">Acima máx.</button>
+    </div>
+    <div id="stockList" class="list"></div>
+  </section>
+
+  <section id="movimento" class="section">
+    <div class="card">
+      <h2>Entrada / Saída</h2>
+      <div class="form">
+        <label>Produto</label>
+        <select id="movProduct" class="select"></select>
+        <div class="row2">
+          <div><label>Tipo</label><select id="movType" class="select"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
+          <div><label>Quantidade</label><input id="movQty" class="input" type="number" min="0" step="0.001" placeholder="0"></div>
+        </div>
+        <label>Observação</label>
+        <textarea id="movObs" class="textarea" placeholder="Ex.: compra, produção, ajuste, perda..."></textarea>
+        <button class="btn ok" onclick="saveMovement()">Salvar movimentação</button>
       </div>
+    </div>
+  </section>
 
-      <div class="chips">
-        <button class="chip active" type="button" data-filter="todos">Tudo</button>
-        <button class="chip" type="button" data-filter="ok">OK</button>
-        <button class="chip" type="button" data-filter="baixo">Baixo</button>
-        <button class="chip" type="button" data-filter="zero">Zerado</button>
-        <button class="chip" type="button" data-filter="excesso">Acima do máx.</button>
+  <section id="novo" class="section">
+    <div class="card">
+      <h2>Cadastrar novo item</h2>
+      <div class="form">
+        <div class="row2">
+          <div><label>Setor</label><input id="newSetor" class="input" placeholder="Ex.: CONFEITARIA"></div>
+          <div><label>Código</label><input id="newCodigo" class="input" placeholder="Ex.: MP999"></div>
+        </div>
+        <label>Produto</label>
+        <input id="newProduto" class="input" placeholder="Nome do produto">
+        <div class="row3">
+          <div><label>Quantidade</label><input id="newQtd" class="input" type="number" step="0.001" value="0"></div>
+          <div><label>Mínimo</label><input id="newMin" class="input" type="number" step="0.001" value="0"></div>
+          <div><label>Máximo</label><input id="newMax" class="input" type="number" step="0.001" value="0"></div>
+        </div>
+        <div class="row2">
+          <div><label>Unidade</label><input id="newUnidade" class="input" placeholder="un, pct, kg..."></div>
+          <div><label>Observação</label><input id="newObs" class="input" placeholder="opcional"></div>
+        </div>
+        <button class="btn ok" onclick="saveNewItem()">Cadastrar item</button>
       </div>
+    </div>
+  </section>
 
-      <div id="stockList" class="list"></div>
-    </section>
+  <section id="compras" class="section">
+    <div class="card">
+      <h2>Lista de compras</h2>
+      <p class="hint">Produtos zerados ou abaixo do mínimo. A sugestão compra até chegar ao máximo cadastrado.</p>
+      <button class="btn ghost" onclick="exportShopping()">Exportar CSV</button>
+    </div>
+    <div id="shoppingList" class="list"></div>
+  </section>
 
-    <section id="telaMovimento" class="screen">
-      <div class="card">
-        <h2>Entrada e saída</h2>
-        <p class="hint">Use esta tela para lançar compra, consumo, perda, ajuste ou saída de produção. A quantidade será atualizada direto na aba BASE_SITE.</p>
-
-        <form id="movementForm" class="form">
-          <label for="movSearch">Buscar produto</label>
-          <input id="movSearch" class="field" type="search" placeholder="Digite para filtrar a lista..." autocomplete="off" />
-
-          <label for="movItem">Produto</label>
-          <select id="movItem" class="field" required></select>
-
-          <div class="two">
-            <div>
-              <label for="movType">Tipo</label>
-              <select id="movType" class="field" required>
-                <option value="entrada">Entrada</option>
-                <option value="saida">Saída</option>
-              </select>
-            </div>
-            <div>
-              <label for="movQty">Quantidade</label>
-              <input id="movQty" class="field" type="number" min="0" step="0.001" placeholder="0" required />
-            </div>
-          </div>
-
-          <label for="movNote">Observação</label>
-          <textarea id="movNote" class="field" placeholder="Ex.: compra, produção, perda, ajuste manual..."></textarea>
-
-          <button class="btn ok" type="submit">Salvar movimentação</button>
-          <div id="movMsg"></div>
-        </form>
+  <section id="config" class="section">
+    <div class="card">
+      <h2>Configuração</h2>
+      <div class="form">
+        <label>URL /exec do Apps Script</label>
+        <input id="apiUrlInput" class="input" placeholder="Cole aqui a URL terminada em /exec">
+        <button class="btn ok" onclick="saveApiUrl()">Salvar URL</button>
+        <button class="btn blue" onclick="testApi()">Testar conexão</button>
+        <button class="btn secondary" onclick="clearConfig()">Limpar configuração</button>
+        <div class="alert">
+          Não cole o link de edição do projeto Apps Script. Use apenas a URL de implantação do App da Web, que termina com <b>/exec</b>.
+        </div>
       </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Histórico recente</h2>
+      <div id="historyList" class="list"></div>
+    </div>
+  </section>
+</main>
 
-      <div class="card mt">
-        <h2>Últimas movimentações</h2>
-        <div id="historyList" class="list compact"></div>
+<nav class="tabs">
+  <button class="tab active" onclick="go('estoque',this)">Estoque</button>
+  <button class="tab" onclick="go('movimento',this)">Mov.</button>
+  <button class="tab" onclick="go('novo',this)">Novo</button>
+  <button class="tab" onclick="go('compras',this)">Compras</button>
+  <button class="tab" onclick="go('config',this)">Config</button>
+</nav>
+
+<div id="quickModal" class="modal">
+  <div class="modalBox">
+    <h2 id="quickTitle">Movimentação</h2>
+    <div class="form">
+      <input id="quickRow" type="hidden">
+      <input id="quickTipo" type="hidden">
+      <label>Quantidade</label>
+      <input id="quickQty" class="input" type="number" min="0" step="0.001" placeholder="0">
+      <label>Observação</label>
+      <textarea id="quickObs" class="textarea" placeholder="opcional"></textarea>
+      <div class="row2">
+        <button class="btn secondary" onclick="closeQuick()">Cancelar</button>
+        <button class="btn ok" onclick="saveQuick()">Salvar</button>
       </div>
-    </section>
+    </div>
+  </div>
+</div>
 
-    <section id="telaNovo" class="screen">
-      <div class="card">
-        <h2>Adicionar novo item</h2>
-        <p class="hint">O novo produto será incluído no final da aba BASE_SITE e também registrado no histórico.</p>
-
-        <form id="addForm" class="form">
-          <div class="two">
-            <div>
-              <label for="newSetor">Setor</label>
-              <input id="newSetor" class="field" placeholder="Ex.: MERCADO" required />
-            </div>
-            <div>
-              <label for="newCodigo">Código</label>
-              <input id="newCodigo" class="field" placeholder="Ex.: MP999" />
-            </div>
-          </div>
-
-          <label for="newProduto">Produto</label>
-          <input id="newProduto" class="field" placeholder="Nome do produto" required />
-
-          <div class="three">
-            <div>
-              <label for="newQtd">Qtd inicial</label>
-              <input id="newQtd" class="field" type="number" min="0" step="0.001" value="0" />
-            </div>
-            <div>
-              <label for="newMin">Mínimo</label>
-              <input id="newMin" class="field" type="number" min="0" step="0.001" value="1" />
-            </div>
-            <div>
-              <label for="newMax">Máximo</label>
-              <input id="newMax" class="field" type="number" min="0" step="0.001" value="10" />
-            </div>
-          </div>
-
-          <div class="two">
-            <div>
-              <label for="newUnidade">Unidade</label>
-              <input id="newUnidade" class="field" placeholder="un, kg, pct..." value="un" />
-            </div>
-            <div>
-              <label for="newObs">Observação</label>
-              <input id="newObs" class="field" placeholder="Opcional" />
-            </div>
-          </div>
-
-          <button class="btn" type="submit">Cadastrar item</button>
-          <div id="addMsg"></div>
-        </form>
-      </div>
-    </section>
-
-    <section id="telaCompras" class="screen">
-      <div class="card">
-        <h2>Lista de compras</h2>
-        <p class="hint">Itens zerados ou abaixo do mínimo. A sugestão de compra calcula quanto falta para chegar ao máximo.</p>
-        <button id="btnExportShopping" class="btn secondary" type="button">Exportar CSV</button>
-      </div>
-      <div id="shoppingList" class="list"></div>
-    </section>
-
-    <section id="telaConfig" class="screen">
-      <div class="card">
-        <h2>Configuração</h2>
-        <p class="hint">Esta é a versão final em arquivo único. Ela já está configurada com a URL do Google Apps Script e usa JSONP para evitar bloqueio de CORS.</p>
-        <div class="codebox">VERSAO FINAL JSONP - API configurada</div>
-      </div>
-
-      <div class="card mt">
-        <h2>Base esperada</h2>
-        <p class="hint">A aba BASE_SITE precisa ter este cabeçalho:</p>
-        <div class="codebox">setor | codigo | produto | qtd | minimo | maximo | unidade | observacao</div>
-      </div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav active" type="button" data-screen="telaEstoque">Estoque</button>
-    <button class="nav" type="button" data-screen="telaMovimento">Entrada/Saída</button>
-    <button class="nav" type="button" data-screen="telaNovo">Novo</button>
-    <button class="nav" type="button" data-screen="telaCompras">Compras</button>
-    <button class="nav" type="button" data-screen="telaConfig">Config</button>
-  </nav>
-
-  <script>
-// =====================================================
-// CONFIGURACAO PRINCIPAL
-// =====================================================
-// 1) Depois de publicar o Google Apps Script como Web App,
-//    cole a URL abaixo.
-// 2) Exemplo: https://script.google.com/macros/s/AKfycbx.../exec
-const API_URL = 'https://script.google.com/macros/s/AKfycbzCoZkgrbz7QiSphRFmLJ6tVvEu7zsUelxFuzA9r51VtM_QTOsVRJHDdmPp00JH-PI9kyg/exec';
-
-// Token opcional. Se voce preencher WRITE_TOKEN no Code.gs,
-// coloque o mesmo valor aqui. Se deixar vazio no Code.gs, deixe vazio aqui tambem.
-const API_TOKEN = '';
-const APP_VERSION = 'FINAL-JSONP-03-05-2026';
-
-// Fallback de leitura, caso o Apps Script ainda nao esteja configurado.
-const SHEET_ID = '1WkmVkfNAu83_Sc7AfFnofP-1oSpdJxdjOmlyTcLcvTc';
-const SHEET_GID = '247051946';
-const CSV_URLS = [
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`,
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`
-];
-
-const CACHE_KEY = 'controle_estoque_v2_cache';
-
+<script>
+const DEFAULT_API_URL = '';
+const API_KEY = 'estoque_api_url_v3';
+let API_URL = localStorage.getItem(API_KEY) || DEFAULT_API_URL;
 let items = [];
 let history = [];
 let filter = 'todos';
 let activeSector = 'todos';
-let lastLoadedAt = null;
 
-const $ = (id) => document.getElementById(id);
+function $(id){return document.getElementById(id)}
+function normalize(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function num(v){let s=String(v??'').trim().replace(/\s/g,''); if(!s)return 0; if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.'); else s=s.replace(',','.'); const n=Number(s); return Number.isFinite(n)?n:0}
+function fmt(n){const x=Number(n||0);return Number.isInteger(x)?String(x):x.toLocaleString('pt-BR',{maximumFractionDigits:3})}
+function apiReady(){return API_URL && API_URL.includes('/exec')}
 
-function apiConfigured(){
-  return API_URL && !API_URL.includes('COLE_AQUI') && API_URL.startsWith('http');
-}
+function api(action, params={}){
+  if(!apiReady()) return Promise.reject(new Error('Configure primeiro a URL /exec do Apps Script na aba Config.'));
 
-function normalize(s){
-  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-}
+  return new Promise((resolve,reject)=>{
+    const cb='__estoque_cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const url=new URL(API_URL);
+    url.searchParams.set('action',action);
+    url.searchParams.set('callback',cb);
+    url.searchParams.set('_',Date.now());
+    Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v??''));
 
-function toNumber(v){
-  if(v === null || v === undefined) return 0;
-  let s = String(v).trim().replace(/\s/g,'');
-  if(!s) return 0;
-  if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.');
-  else s = s.replace(',','.');
-  const n = Number(s);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function fmt(n){
-  const x = Number(n || 0);
-  return Number.isInteger(x) ? String(x) : x.toLocaleString('pt-BR',{maximumFractionDigits:3});
-}
-
-function escapeHtml(s){
-  return String(s ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-}
-
-function setAlert(type, msg){
-  const cls = type === 'success' ? 'success' : type === 'danger' ? 'danger' : '';
-  $('systemAlert').innerHTML = msg ? `<div class="alert ${cls}">${msg}</div>` : '';
-}
-
-function setMessage(el, type, msg){
-  const cls = type === 'success' ? 'success' : type === 'danger' ? 'danger' : '';
-  el.innerHTML = msg ? `<div class="alert ${cls}">${msg}</div>` : '';
-}
-
-function getStatus(item){
-  const qtd = Number(item.qtd || 0);
-  const minimo = Number(item.minimo || 0);
-  const maximo = Number(item.maximo || 0);
-  if(qtd <= 0) return {key:'zero', label:'Zerado', cls:'zero'};
-  if(minimo > 0 && qtd < minimo) return {key:'baixo', label:'Baixo estoque', cls:'low'};
-  if(maximo > 0 && qtd > maximo) return {key:'excesso', label:'Acima do máximo', cls:'extra'};
-  return {key:'ok', label:'OK', cls:'ok'};
-}
-
-function apiRequest(action, params = {}){
-  if(!apiConfigured()){
-    return Promise.reject(new Error('API do Google Apps Script ainda nao configurada.'));
-  }
-
-  return new Promise((resolve, reject) => {
-    const callbackName = '__estoque_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const url = new URL(API_URL);
-
-    url.searchParams.set('action', action);
-    url.searchParams.set('callback', callbackName);
-    url.searchParams.set('_', Date.now());
-
-    if(API_TOKEN) url.searchParams.set('token', API_TOKEN);
-
-    Object.entries(params).forEach(([key, value]) => {
-      url.searchParams.set(key, value ?? '');
-    });
-
-    const script = document.createElement('script');
-    let finished = false;
-
-    function cleanup(){
-      finished = true;
-      try{ delete window[callbackName]; }catch(e){ window[callbackName] = undefined; }
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    const timer = setTimeout(() => {
-      if(finished) return;
-      cleanup();
-      reject(new Error('Tempo esgotado ao conectar com o Google Apps Script.'));
-    }, 20000);
-
-    window[callbackName] = function(data){
+    const script=document.createElement('script');
+    let done=false;
+    const cleanup=()=>{
+      done=true;
       clearTimeout(timer);
+      try{delete window[cb]}catch(e){window[cb]=undefined}
+      script.remove();
+    };
+    const timer=setTimeout(()=>{
+      if(done)return;
       cleanup();
+      reject(new Error('Tempo esgotado. Confira se a implantação do Apps Script está como: Quem tem acesso = Qualquer pessoa.'));
+    },20000);
 
-      if(!data || data.ok === false){
-        reject(new Error((data && data.error) ? data.error : 'Erro desconhecido no Apps Script.'));
-        return;
+    window[cb]=(data)=>{
+      cleanup();
+      if(!data || data.ok===false){
+        reject(new Error(data && data.error ? data.error : 'Erro desconhecido no Apps Script.'));
+      }else{
+        resolve(data);
       }
-
-      resolve(data);
     };
-
-    script.onerror = function(){
-      clearTimeout(timer);
+    script.onerror=()=>{
       cleanup();
-      reject(new Error('Falha ao carregar o script do Apps Script. Verifique se o Web App esta publicado para Qualquer pessoa.'));
+      reject(new Error('Falha ao carregar o Apps Script. A URL /exec pode estar errada ou a implantação não está pública para Qualquer pessoa.'));
     };
-
-    script.src = url.toString();
+    script.src=url.toString();
     document.head.appendChild(script);
   });
 }
 
+function setStatus(html){$('statusBox').innerHTML=html}
+function loading(msg){setStatus(`<div class="loader"><span class="spin"></span>${escapeHtml(msg)}</div>`)}
+
 async function loadData(){
-  $('headerStatus').textContent = 'Atualizando dados...';
-  setAlert('', '');
-
   try{
-    if(apiConfigured()){
-      const data = await apiRequest('listar');
-      items = data.items || [];
-      history = data.history || [];
-      lastLoadedAt = new Date();
-      saveCache();
-      setAlert('success', `VERSAO FINAL JSONP ativa. Base conectada ao Google Apps Script. ${items.length} itens carregados.`);
-    }else{
-      throw new Error('API_URL nao configurada no sistema.');
-    }
+    loading('Carregando dados da planilha...');
+    const data=await api('listar');
+    items=data.items||[];
+    history=data.history||[];
+    setStatus(`<div class="alert success">VERSÃO NOVA LIMPA ativa. Dados carregados: ${items.length} itens.</div>`);
+    renderAll();
   }catch(err){
-    const cached = loadCache();
-    if(cached){
-      items = cached.items || [];
-      history = cached.history || [];
-      lastLoadedAt = new Date(cached.savedAt);
-      setAlert('danger', `Nao consegui atualizar online. Carreguei o cache deste aparelho. Detalhe: ${escapeHtml(err.message)}`);
-    }else{
-      setAlert('danger', `Nao foi possivel carregar os dados. Detalhe: ${escapeHtml(err.message)}`);
-    }
+    setStatus(`<div class="alert danger">Não foi possível carregar os dados. Detalhe: ${escapeHtml(err.message)}</div>`);
   }
-
-  renderAll();
 }
 
-async function loadCsvFallback(){
-  let lastError = null;
-  for(const baseUrl of CSV_URLS){
-    try{
-      const url = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'cacheBust=' + Date.now();
-      const res = await fetch(url, {cache:'no-store'});
-      if(!res.ok) throw new Error('Erro HTTP ' + res.status);
-      const text = await res.text();
-      if(!text || text.toLowerCase().includes('<html')) throw new Error('A resposta nao parece ser CSV.');
-      const rows = parseCSV(text);
-      items = mapRows(rows);
-      history = [];
-      lastLoadedAt = new Date();
-      saveCache();
-      return;
-    }catch(err){ lastError = err; }
-  }
-  throw lastError || new Error('CSV da planilha indisponivel.');
-}
-
-function saveCache(){
-  localStorage.setItem(CACHE_KEY, JSON.stringify({savedAt:new Date().toISOString(), items, history}));
-}
-
-function loadCache(){
+async function testApi(){
+  saveApiUrl(false);
   try{
-    const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch{ return null; }
-}
-
-function parseCSV(text){
-  const rows = [];
-  let row = [], cur = '', quote = false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i], nx=text[i+1];
-    if(ch === '"' && quote && nx === '"'){cur += '"'; i++; continue;}
-    if(ch === '"'){quote = !quote; continue;}
-    if((ch === ',' || ch === ';' || ch === '\t') && !quote){row.push(cur); cur=''; continue;}
-    if((ch === '\n' || ch === '\r') && !quote){
-      if(cur || row.length){row.push(cur); rows.push(row); row=[]; cur='';}
-      if(ch === '\r' && nx === '\n') i++;
-      continue;
-    }
-    cur += ch;
+    loading('Testando Apps Script...');
+    const data=await api('listar');
+    setStatus(`<div class="alert success">Conexão OK. Itens encontrados: ${(data.items||[]).length}</div>`);
+    items=data.items||[];
+    history=data.history||[];
+    renderAll();
+  }catch(err){
+    setStatus(`<div class="alert danger">Teste falhou: ${escapeHtml(err.message)}</div>`);
   }
-  if(cur || row.length){row.push(cur); rows.push(row);}
-  return rows.filter(r => r.some(c => String(c).trim()));
 }
 
-function mapRows(rows){
-  if(!rows.length) return [];
-  const headers = rows[0].map(h => normalize(h));
-  const idx = (...names) => names.map(n => headers.indexOf(normalize(n))).find(i => i >= 0) ?? -1;
-  const iSetor = idx('setor','categoria','grupo');
-  const iCodigo = idx('codigo','código','cod','sku');
-  const iProduto = idx('produto','item','descricao','descrição','nome');
-  const iQtd = idx('qtd','quantidade','saldo','estoque');
-  const iMin = idx('minimo','mínimo','min');
-  const iMax = idx('maximo','máximo','max');
-  const iUn = idx('unidade','und','un');
-  const iObs = idx('observacao','observação','obs');
-  if(iProduto < 0 || iQtd < 0) throw new Error('Colunas produto e qtd nao encontradas.');
-  return rows.slice(1).map((r,i)=>({
-    row:i+2,
-    setor:String(r[iSetor] || 'GERAL').trim() || 'GERAL',
-    codigo:String(r[iCodigo] || '').trim(),
-    produto:String(r[iProduto] || '').trim(),
-    qtd:toNumber(r[iQtd]),
-    minimo:toNumber(r[iMin]),
-    maximo:toNumber(r[iMax]),
-    unidade:String(r[iUn] || '').trim(),
-    observacao:String(r[iObs] || '').trim()
-  })).filter(i => i.produto);
+function saveApiUrl(show=true){
+  const val=$('apiUrlInput').value.trim();
+  if(!val || !val.includes('/exec')){
+    if(show) alert('Cole a URL do App da Web terminada em /exec.');
+    return false;
+  }
+  API_URL=val;
+  localStorage.setItem(API_KEY,API_URL);
+  if(show) setStatus('<div class="alert success">URL salva. Clique em Atualizar ou Testar conexão.</div>');
+  return true;
+}
+
+function clearConfig(){
+  localStorage.removeItem(API_KEY);
+  API_URL='';
+  $('apiUrlInput').value='';
+  setStatus('<div class="alert">Configuração apagada. Cole novamente a URL /exec.</div>');
+}
+
+function statusOf(i){
+  const q=Number(i.qtd||0), min=Number(i.minimo||0), max=Number(i.maximo||0);
+  if(q<=0)return{key:'zero',label:'Zerado',cls:'zero'};
+  if(min>0&&q<min)return{key:'baixo',label:'Baixo',cls:'low'};
+  if(max>0&&q>max)return{key:'excesso',label:'Acima máx.',cls:'extra'};
+  return{key:'ok',label:'OK',cls:'ok'};
 }
 
 function renderStats(){
-  const total = items.length;
-  const baixos = items.filter(i => getStatus(i).key === 'baixo').length;
-  const zerados = items.filter(i => getStatus(i).key === 'zero').length;
-  const compras = shoppingItems().length;
-  $('stats').innerHTML = `
-    <div class="stat"><b>${total}</b><span>itens cadastrados</span></div>
-    <div class="stat"><b>${baixos}</b><span>baixo estoque</span></div>
-    <div class="stat"><b>${zerados}</b><span>zerados</span></div>
-    <div class="stat"><b>${compras}</b><span>itens para comprar</span></div>`;
-  $('headerStatus').textContent = lastLoadedAt ? `Ultima atualizacao: ${lastLoadedAt.toLocaleString('pt-BR')}` : 'Base nao carregada';
+  const total=items.length;
+  const zero=items.filter(i=>statusOf(i).key==='zero').length;
+  const baixo=items.filter(i=>statusOf(i).key==='baixo').length;
+  const excesso=items.filter(i=>statusOf(i).key==='excesso').length;
+  $('stats').innerHTML=`
+    <div class="card stat"><b>${total}</b><span>itens</span></div>
+    <div class="card stat"><b>${baixo}</b><span>baixo estoque</span></div>
+    <div class="card stat"><b>${zero}</b><span>zerados</span></div>
+    <div class="card stat"><b>${excesso}</b><span>acima máximo</span></div>`;
 }
 
-function renderSectorFilter(){
-  const sectors = [...new Set(items.map(i => i.setor || 'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  $('sectorFilter').innerHTML = `<option value="todos">Todos os setores</option>` + sectors.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
-  $('sectorFilter').value = activeSector;
-
-  const currentNew = $('newSetor').value.trim();
-  if(!currentNew && sectors.length) $('newSetor').value = sectors[0];
+function renderSectors(){
+  const sectors=[...new Set(items.map(i=>i.setor||'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  $('sector').innerHTML='<option value="todos">Todos os setores</option>'+sectors.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  $('sector').value=activeSector;
 }
 
-function filteredItems(){
-  const q = normalize($('searchStock').value);
-  return items.filter(i => {
-    const st = getStatus(i).key;
-    const matchText = !q || normalize(`${i.setor} ${i.codigo} ${i.produto} ${i.observacao}`).includes(q);
-    const matchSector = activeSector === 'todos' || i.setor === activeSector;
-    const matchFilter = filter === 'todos' || filter === st;
-    return matchText && matchSector && matchFilter;
+function filtered(){
+  const q=normalize($('search').value);
+  return items.filter(i=>{
+    const st=statusOf(i).key;
+    const text=normalize(`${i.setor} ${i.codigo} ${i.produto} ${i.observacao}`);
+    return (!q||text.includes(q)) && (activeSector==='todos'||i.setor===activeSector) && (filter==='todos'||filter===st);
   }).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'));
 }
 
 function renderStock(){
-  const arr = filteredItems();
-  const box = $('stockList');
-  if(!arr.length){box.innerHTML = '<div class="empty">Nenhum item encontrado.</div>'; return;}
-  box.innerHTML = arr.map(i => {
-    const st = getStatus(i);
+  const arr=filtered();
+  if(!arr.length){$('stockList').innerHTML='<div class="empty">Nenhum item encontrado.</div>';return}
+  $('stockList').innerHTML=arr.map(i=>{
+    const st=statusOf(i);
     return `<div class="item ${st.cls}">
       <div>
         <div class="name">${escapeHtml(i.produto)}</div>
-        <div class="code">${escapeHtml(i.codigo || 'sem código')} • ${escapeHtml(i.setor)} ${i.unidade ? '• ' + escapeHtml(i.unidade) : ''}</div>
-        <div class="metaRow"><span class="badge ${st.cls}">${st.label}</span><span class="badge">mín: ${fmt(i.minimo)}</span><span class="badge">máx: ${fmt(i.maximo)}</span></div>
+        <div class="code">${escapeHtml(i.codigo||'sem código')} • ${escapeHtml(i.setor||'GERAL')} ${i.unidade?'• '+escapeHtml(i.unidade):''}</div>
+        <span class="badge ${st.cls}">${st.label}</span>
+        <span class="badge">mín: ${fmt(i.minimo)}</span>
+        <span class="badge">máx: ${fmt(i.maximo)}</span>
       </div>
-      <div class="qty">${fmt(i.qtd)}<small>em estoque</small></div>
+      <div class="qty">${fmt(i.qtd)}<small>estoque</small></div>
       <div class="actions">
-        <button class="btn ok" type="button" onclick="presetMovement(${i.row}, 'entrada')">Entrada</button>
-        <button class="btn warn" type="button" onclick="presetMovement(${i.row}, 'saida')">Saída</button>
+        <button class="btn ok" onclick="openQuick(${i.row},'entrada','${escapeHtml(i.produto)}')">Entrada</button>
+        <button class="btn warn" onclick="openQuick(${i.row},'saida','${escapeHtml(i.produto)}')">Saída</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderMovementSelect(){
-  const q = normalize($('movSearch').value);
-  const arr = items.filter(i => !q || normalize(`${i.codigo} ${i.produto} ${i.setor}`).includes(q)).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'));
-  $('movItem').innerHTML = arr.map(i => `<option value="${i.row}">${escapeHtml(i.codigo || 'sem código')} - ${escapeHtml(i.produto)} | qtd: ${fmt(i.qtd)}</option>`).join('');
-}
-
-function renderHistory(){
-  const box = $('historyList');
-  if(!history.length){box.innerHTML = '<div class="empty">Nenhum histórico carregado.</div>'; return;}
-  box.innerHTML = history.slice(0,20).map(h => {
-    const type = String(h.tipo || h.type || '').toLowerCase();
-    const sign = type === 'entrada' || type === 'cadastro' ? '+' : '-';
-    const cls = type === 'entrada' || type === 'cadastro' ? 'ok' : 'warn';
-    return `<div class="item"><div><div class="name">${sign}${fmt(h.quantidade || h.qtd)} • ${escapeHtml(h.produto || '')}</div><div class="code">${escapeHtml(h.codigo || '')} • ${escapeHtml(h.tipo || '')} • ${escapeHtml(h.data || '')}</div>${h.observacao ? `<div class="hint">${escapeHtml(h.observacao)}</div>` : ''}</div><span class="badge ${cls}">${escapeHtml(h.tipo || '')}</span></div>`;
-  }).join('');
+function renderSelect(){
+  $('movProduct').innerHTML=items.slice().sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR')).map(i=>`<option value="${i.row}">${escapeHtml(i.codigo||'sem código')} - ${escapeHtml(i.produto)} | qtd: ${fmt(i.qtd)}</option>`).join('');
 }
 
 function shoppingItems(){
-  return items.filter(i => ['zero','baixo'].includes(getStatus(i).key)).sort((a,b) => {
-    const az = getStatus(a).key === 'zero' ? 0 : 1;
-    const bz = getStatus(b).key === 'zero' ? 0 : 1;
-    return az - bz || a.produto.localeCompare(b.produto,'pt-BR');
-  });
+  return items.filter(i=>['zero','baixo'].includes(statusOf(i).key)).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'));
 }
 
-function suggestedBuy(i){
-  const qtd = Number(i.qtd || 0);
-  const min = Number(i.minimo || 0);
-  const max = Number(i.maximo || 0);
-  if(max > 0 && max > qtd) return max - qtd;
-  if(min > 0 && min > qtd) return min - qtd;
-  return qtd <= 0 ? 1 : 0;
+function suggested(i){
+  const q=Number(i.qtd||0), min=Number(i.minimo||0), max=Number(i.maximo||0);
+  if(max>0&&max>q)return max-q;
+  if(min>0&&min>q)return min-q;
+  return q<=0?1:0;
 }
 
 function renderShopping(){
-  const arr = shoppingItems();
-  const box = $('shoppingList');
-  if(!arr.length){box.innerHTML = '<div class="empty">Nenhum item para comprar agora.</div>'; return;}
-  box.innerHTML = arr.map(i => {
-    const st = getStatus(i);
-    return `<div class="item ${st.cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo || 'sem código')} • ${escapeHtml(i.setor)}</div><div class="metaRow"><span class="badge ${st.cls}">${st.label}</span><span class="badge">atual: ${fmt(i.qtd)}</span><span class="badge">mín: ${fmt(i.minimo)}</span><span class="badge">máx: ${fmt(i.maximo)}</span></div></div><div class="qty">${fmt(suggestedBuy(i))}<small>sugestão</small></div></div>`;
+  const arr=shoppingItems();
+  if(!arr.length){$('shoppingList').innerHTML='<div class="empty">Nenhum item para comprar.</div>';return}
+  $('shoppingList').innerHTML=arr.map(i=>{
+    const st=statusOf(i);
+    return `<div class="item ${st.cls}">
+      <div>
+        <div class="name">${escapeHtml(i.produto)}</div>
+        <div class="code">${escapeHtml(i.codigo||'sem código')} • ${escapeHtml(i.setor||'GERAL')}</div>
+        <span class="badge ${st.cls}">${st.label}</span>
+        <span class="badge">atual: ${fmt(i.qtd)}</span>
+        <span class="badge">mín: ${fmt(i.minimo)}</span>
+        <span class="badge">máx: ${fmt(i.maximo)}</span>
+      </div>
+      <div class="qty">${fmt(suggested(i))}<small>comprar</small></div>
+    </div>`;
   }).join('');
 }
 
+function renderHistory(){
+  if(!history.length){$('historyList').innerHTML='<div class="empty">Sem histórico recente.</div>';return}
+  $('historyList').innerHTML=history.map(h=>`<div class="item">
+    <div>
+      <div class="name">${escapeHtml(h.produto||'')}</div>
+      <div class="code">${escapeHtml(h.data||'')} • ${escapeHtml(h.tipo||'')} • ${escapeHtml(h.codigo||'')}</div>
+      ${h.observacao?`<div class="hint">${escapeHtml(h.observacao)}</div>`:''}
+    </div>
+    <div class="qty">${escapeHtml(h.quantidade||'0')}<small>mov.</small></div>
+  </div>`).join('');
+}
+
 function renderAll(){
-  renderStats();
-  renderSectorFilter();
-  renderStock();
-  renderMovementSelect();
-  renderHistory();
-  renderShopping();
+  renderStats();renderSectors();renderStock();renderSelect();renderShopping();renderHistory();
+  $('apiUrlInput').value=API_URL||'';
 }
 
-function showScreen(screenId){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  $(screenId).classList.add('active');
-  document.querySelectorAll('.nav').forEach(n => n.classList.toggle('active', n.dataset.screen === screenId));
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+function setFilter(btn,f){filter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderStock()}
+function go(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');if(id==='compras')renderShopping();if(id==='config')renderHistory();window.scrollTo({top:0,behavior:'smooth'})}
+$('search').addEventListener('input',renderStock);
+$('sector').addEventListener('change',function(){activeSector=this.value;renderStock()});
 
-function presetMovement(row, tipo){
-  showScreen('telaMovimento');
-  $('movSearch').value = '';
-  renderMovementSelect();
-  $('movItem').value = String(row);
-  $('movType').value = tipo;
-  $('movQty').focus();
+function openQuick(row,tipo,produto){
+  $('quickRow').value=row;$('quickTipo').value=tipo;$('quickQty').value='';$('quickObs').value='';
+  $('quickTitle').textContent=(tipo==='entrada'?'Entrada: ':'Saída: ')+produto;
+  $('quickModal').classList.add('open');
+  setTimeout(()=>$('quickQty').focus(),100);
 }
+function closeQuick(){$('quickModal').classList.remove('open')}
 
-async function submitMovement(ev){
-  ev.preventDefault();
-  const msg = $('movMsg');
-  if(!apiConfigured()){
-    setMessage(msg, 'danger', 'Configure a URL do Apps Script em js/app.js para salvar entrada e saída na planilha.');
-    return;
-  }
-  const row = $('movItem').value;
-  const tipo = $('movType').value;
-  const quantidade = toNumber($('movQty').value);
-  const observacao = $('movNote').value.trim();
-  if(!row || quantidade <= 0){setMessage(msg, 'danger', 'Informe produto e quantidade maior que zero.'); return;}
+async function saveQuick(){
+  const row=$('quickRow').value,tipo=$('quickTipo').value,quantidade=$('quickQty').value,observacao=$('quickObs').value;
   try{
-    $('movementForm').querySelector('button[type="submit"]').disabled = true;
-    const data = await apiRequest('movimentar', {row, tipo, quantidade, observacao});
-    setMessage(msg, 'success', data.message || 'Movimentação salva com sucesso.');
-    $('movQty').value = '';
-    $('movNote').value = '';
+    loading('Salvando movimentação...');
+    await api('movimentar',{row,tipo,quantidade,observacao});
+    closeQuick();
     await loadData();
-    showScreen('telaMovimento');
   }catch(err){
-    setMessage(msg, 'danger', escapeHtml(err.message));
-  }finally{
-    $('movementForm').querySelector('button[type="submit"]').disabled = false;
+    setStatus(`<div class="alert danger">Erro ao salvar: ${escapeHtml(err.message)}</div>`);
   }
 }
 
-async function submitAdd(ev){
-  ev.preventDefault();
-  const msg = $('addMsg');
-  if(!apiConfigured()){
-    setMessage(msg, 'danger', 'Configure a URL do Apps Script em js/app.js para cadastrar direto na planilha.');
-    return;
+async function saveMovement(){
+  const row=$('movProduct').value,tipo=$('movType').value,quantidade=$('movQty').value,observacao=$('movObs').value;
+  try{
+    loading('Salvando movimentação...');
+    await api('movimentar',{row,tipo,quantidade,observacao});
+    $('movQty').value='';$('movObs').value='';
+    await loadData();
+    go('estoque',document.querySelectorAll('.tab')[0]);
+  }catch(err){
+    setStatus(`<div class="alert danger">Erro ao salvar: ${escapeHtml(err.message)}</div>`);
   }
-  const payload = {
-    setor:$('newSetor').value.trim(),
-    codigo:$('newCodigo').value.trim(),
-    produto:$('newProduto').value.trim(),
-    qtd:toNumber($('newQtd').value),
-    minimo:toNumber($('newMin').value),
-    maximo:toNumber($('newMax').value),
-    unidade:$('newUnidade').value.trim(),
-    observacao:$('newObs').value.trim()
+}
+
+async function saveNewItem(){
+  const params={
+    setor:$('newSetor').value,
+    codigo:$('newCodigo').value,
+    produto:$('newProduto').value,
+    qtd:$('newQtd').value,
+    minimo:$('newMin').value,
+    maximo:$('newMax').value,
+    unidade:$('newUnidade').value,
+    observacao:$('newObs').value
   };
-  if(!payload.setor || !payload.produto){setMessage(msg, 'danger', 'Informe pelo menos setor e produto.'); return;}
   try{
-    $('addForm').querySelector('button[type="submit"]').disabled = true;
-    const data = await apiRequest('adicionar', payload);
-    setMessage(msg, 'success', data.message || 'Item cadastrado com sucesso.');
-    $('newCodigo').value = '';
-    $('newProduto').value = '';
-    $('newQtd').value = '0';
-    $('newMin').value = '1';
-    $('newMax').value = '10';
-    $('newObs').value = '';
+    loading('Cadastrando item...');
+    await api('adicionar',params);
+    ['newSetor','newCodigo','newProduto','newQtd','newMin','newMax','newUnidade','newObs'].forEach(id=>$(id).value=(id==='newQtd'||id==='newMin'||id==='newMax')?'0':'');
     await loadData();
-    showScreen('telaNovo');
+    go('estoque',document.querySelectorAll('.tab')[0]);
   }catch(err){
-    setMessage(msg, 'danger', escapeHtml(err.message));
-  }finally{
-    $('addForm').querySelector('button[type="submit"]').disabled = false;
+    setStatus(`<div class="alert danger">Erro ao cadastrar: ${escapeHtml(err.message)}</div>`);
   }
 }
 
 function exportShopping(){
-  const arr = shoppingItems();
-  if(!arr.length){alert('Nao ha itens para comprar.'); return;}
-  const rows = [['setor','codigo','produto','qtd_atual','minimo','maximo','sugestao_compra','unidade','observacao'], ...arr.map(i => [i.setor,i.codigo,i.produto,i.qtd,i.minimo,i.maximo,suggestedBuy(i),i.unidade,i.observacao])];
-  const csv = rows.map(r => r.map(v => `"${String(v ?? '').replaceAll('"','""')}"`).join(';')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lista_de_compras.csv';
+  const arr=shoppingItems();
+  if(!arr.length){alert('Sem itens para exportar.');return}
+  const rows=[['setor','codigo','produto','atual','minimo','maximo','sugestao_compra','unidade'],...arr.map(i=>[i.setor,i.codigo,i.produto,i.qtd,i.minimo,i.maximo,suggested(i),i.unidade])];
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(';')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='lista_de_compras.csv';
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
-function bindEvents(){
-  $('btnReload').addEventListener('click', loadData);
-  $('searchStock').addEventListener('input', renderStock);
-  $('sectorFilter').addEventListener('change', function(){activeSector = this.value; renderStock();});
-  $('movSearch').addEventListener('input', renderMovementSelect);
-  $('movementForm').addEventListener('submit', submitMovement);
-  $('addForm').addEventListener('submit', submitAdd);
-  $('btnExportShopping').addEventListener('click', exportShopping);
-  document.querySelectorAll('.nav').forEach(btn => btn.addEventListener('click', () => showScreen(btn.dataset.screen)));
-  document.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => {
-    filter = btn.dataset.filter;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    renderStock();
-  }));
-}
-
-bindEvents();
-loadData();
-
-  </script>
+renderAll();
+if(apiReady()) loadData();
+</script>
 </body>
 </html>
