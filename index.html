@@ -1,105 +1,169 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111827">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
   <title>Controle de Estoque</title>
-  <style>
-    :root{--bg:#f3f4f6;--panel:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#111827;--ok:#047857;--warn:#b45309;--bad:#b91c1c;--blue:#1d4ed8;--shadow:0 14px 35px rgba(17,24,39,.10);--radius:18px}
-    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}body{padding-bottom:92px}button,input,select{font:inherit}.wrap{max-width:1180px;margin:0 auto;padding:16px}
-    header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:18px 16px;border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:var(--shadow)}header .top{display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:1180px;margin:auto}h1{font-size:22px;margin:0;letter-spacing:-.02em}h2{font-size:19px;margin:0 0 10px}.sub{opacity:.84;font-size:13px;margin-top:4px;line-height:1.35}.last{font-size:12px;opacity:.82;margin-top:5px}.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
-    .grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin-top:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}.stat b{display:block;font-size:25px;line-height:1.05}.stat span{font-size:12px;color:var(--muted)}
-    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);z-index:20}.tab{border:0;background:#f3f4f6;color:#111827;border-radius:14px;padding:11px 8px;font-weight:800;font-size:12px;cursor:pointer}.tab.active{background:#111827;color:#fff}
-    .toolbar{display:grid;grid-template-columns:1fr 240px auto;gap:10px;margin:14px 0}.search,.select{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;font-size:16px;background:#fff;outline:none}.search:focus,.select:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.10)}
-    .btn{border:0;border-radius:14px;padding:12px 14px;font-weight:900;font-size:14px;cursor:pointer;background:#111827;color:#fff;min-height:46px}.btn.secondary{background:#e5e7eb;color:#111827}.btn.blue{background:var(--blue)}.btn.ghost{background:#fff;color:#111827;border:1px solid var(--line)}
-    .chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin:8px 0 10px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:13px;white-space:nowrap;cursor:pointer}.chip.active{background:#111827;color:#fff;border-color:#111827}
-    .section{display:none}.section.active{display:block}.list{display:grid;gap:10px;margin-top:12px}.item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.item.zero{border-color:#fecaca;background:#fff7f7}.item.low{border-color:#fed7aa;background:#fffaf3}.item.extra{border-color:#bfdbfe;background:#eff6ff}.name{font-weight:900;line-height:1.22}.code{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}.qty{font-size:24px;font-weight:950;text-align:right}.qty small{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-top:2px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;margin-top:7px;border:1px solid var(--line);background:#f9fafb}.badge.ok{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.badge.low{background:#fffbeb;color:#92400e;border-color:#fde68a}.badge.zero{background:#fef2f2;color:#991b1b;border-color:#fecaca}.badge.extra{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}.meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-    .empty{text-align:center;color:var(--muted);padding:28px 10px;background:#fff;border:1px dashed var(--line);border-radius:18px}.alert{padding:12px;border-radius:14px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;font-weight:750;font-size:13px;line-height:1.45}.alert.success{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.alert.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca}.hint{font-size:13px;color:var(--muted);line-height:1.5}.setorCard{display:grid;gap:8px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.setorTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.setorTitle{font-weight:950}.setorNumber{font-size:24px;font-weight:950}.progress{height:9px;background:#eef2f7;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:#111827;border-radius:999px}.smallActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.loader{display:flex;align-items:center;gap:10px;color:#374151;font-weight:850}.spin{width:18px;height:18px;border-radius:50%;border:3px solid #d1d5db;border-top-color:#111827;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-    @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr}.item{grid-template-columns:1fr 86px}h1{font-size:19px}.wrap{padding:12px}.pill{display:none}.btn{width:100%}.smallActions .btn{width:auto;flex:1}}
-  </style>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<header>
-  <div class="top">
-    <div><h1>Controle de Estoque</h1><div class="sub">Base conectada a planilha Google - aba BASE_SITE</div><div id="lastUpdate" class="last">Carregando dados...</div></div>
-    <div class="pill">Celular - Tablet - Computador</div>
-  </div>
-</header>
-<main class="wrap">
-  <div id="statusBox" class="card"><div class="loader"><span class="spin"></span> Buscando dados da planilha...</div></div>
-  <section class="grid stats" id="stats"></section>
-
-  <section id="estoque" class="section active">
-    <div class="toolbar">
-      <input id="searchStock" class="search" placeholder="Buscar por codigo, produto ou setor..." autocomplete="off">
-      <select id="sectorSelect" class="select"></select>
-      <button class="btn blue" onclick="loadData(true)">Atualizar</button>
+  <header class="app-header">
+    <div class="header-inner">
+      <div>
+        <h1>Controle de Estoque</h1>
+        <p id="headerStatus">Carregando base da planilha...</p>
+      </div>
+      <button class="header-btn" id="btnReload" type="button">Atualizar</button>
     </div>
-    <div class="chips">
-      <button class="chip active" onclick="setFilter(this,'todos')">Tudo</button>
-      <button class="chip" onclick="setFilter(this,'ok')">OK</button>
-      <button class="chip" onclick="setFilter(this,'baixo')">Baixo estoque</button>
-      <button class="chip" onclick="setFilter(this,'zero')">Zerados</button>
-      <button class="chip" onclick="setFilter(this,'excesso')">Acima do maximo</button>
-    </div>
-    <div id="stockList" class="list"></div>
-  </section>
+  </header>
 
-  <section id="compras" class="section">
-    <div class="card"><h2>Lista de compras automatica</h2><div class="hint">Mostra produtos zerados ou abaixo do minimo. A sugestao de compra calcula quanto falta para chegar ao maximo.</div><div class="smallActions"><button class="btn ghost" onclick="exportShoppingList()">Exportar lista</button><button class="btn secondary" onclick="window.print()">Imprimir</button></div></div>
-    <div id="shoppingList" class="list"></div>
-  </section>
+  <main class="wrap">
+    <div id="systemAlert"></div>
 
-  <section id="setores" class="section">
-    <div class="card"><h2>Resumo por setor</h2><div class="hint">Veja quais setores tem mais itens criticos, zerados ou abaixo do minimo.</div></div>
-    <div id="sectorCards" class="grid" style="margin-top:12px"></div>
-  </section>
+    <section class="stats" id="stats"></section>
 
-  <section id="ajuda" class="section">
-    <div class="card"><h2>Configuracao da planilha</h2><p class="hint">Este sistema le a aba configurada da sua planilha. A aba precisa ter o cabecalho abaixo:</p><div class="alert">setor | codigo | produto | qtd | minimo | maximo | unidade | observacao</div><p class="hint">Se no GitHub Pages aparecer erro ao carregar, publique a aba BASE_SITE na web em formato CSV: Arquivo > Compartilhar > Publicar na Web.</p></div>
-    <div class="card" style="margin-top:12px"><h2>Proxima fase</h2><p class="hint">Esta versao consulta a planilha e gera lista de compras. Depois podemos adicionar entrada, saida, producao e historico gravando direto na planilha com Google Apps Script.</p></div>
-    <div class="card" style="margin-top:12px"><h2>Fonte de dados</h2><p class="hint" id="sourceInfo"></p></div>
-  </section>
-</main>
-<nav class="tabs">
-  <button class="tab active" onclick="go('estoque',this)">Estoque</button>
-  <button class="tab" onclick="go('compras',this)">Compras</button>
-  <button class="tab" onclick="go('setores',this)">Setores</button>
-  <button class="tab" onclick="go('ajuda',this)">Ajuda</button>
-</nav>
-<script>
-const SHEET_ID='1WkmVkfNAu83_Sc7AfFnofP-1oSpdJxdjOmlyTcLcvTc';
-const SHEET_GID='247051946';
-const CACHE_KEY='controle_estoque_base_site_cache_v1';
-const CSV_URLS=[
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`,
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`
-];
-let items=[],filter='todos',activeSector='todos',lastLoadedAt=null;
-function normalize(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
-function toNumber(v){let s=String(v??'').trim();if(!s)return 0;s=s.replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:0}
-function fmt(n){const x=Number(n||0);return Number.isInteger(x)?String(x):x.toLocaleString('pt-BR',{maximumFractionDigits:3})}
-function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function parseCSV(text){const rows=[];let row=[],cur='',quote=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&quote&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if((ch===','||ch===';'||ch==='\t')&&!quote){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!quote){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''}if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}return rows.filter(r=>r.some(c=>String(c).trim()))}
-function mapRows(rows){if(!rows.length)return[];const headers=rows[0].map(h=>normalize(h));const idx=names=>{for(const n of names){const p=headers.indexOf(normalize(n));if(p>=0)return p}return-1};const iSetor=idx(['setor','categoria','grupo']),iCodigo=idx(['codigo','cod','sku']),iProduto=idx(['produto','item','descricao','nome']),iQtd=idx(['qtd','quantidade','saldo','estoque']),iMin=idx(['minimo','min']),iMax=idx(['maximo','max']),iUn=idx(['unidade','und','un']),iObs=idx(['observacao','obs']);if(iProduto<0||iQtd<0)throw new Error('Nao encontrei as colunas produto e qtd.');return rows.slice(1).map((r,i)=>({id:`${r[iCodigo]||'sem-codigo'}_${i}`,setor:String(r[iSetor]||'GERAL').trim()||'GERAL',codigo:String(r[iCodigo]||'').trim(),produto:String(r[iProduto]||'').trim(),qtd:toNumber(r[iQtd]),minimo:iMin>=0?toNumber(r[iMin]):0,maximo:iMax>=0?toNumber(r[iMax]):0,unidade:iUn>=0?String(r[iUn]||'').trim():'',observacao:iObs>=0?String(r[iObs]||'').trim():''})).filter(i=>i.produto)}
-function getStatus(item){const q=Number(item.qtd||0),mi=Number(item.minimo||0),ma=Number(item.maximo||0);if(q<=0)return{key:'zero',label:'Zerado',cls:'zero'};if(mi>0&&q<mi)return{key:'baixo',label:'Baixo estoque',cls:'low'};if(ma>0&&q>ma)return{key:'excesso',label:'Acima do maximo',cls:'extra'};return{key:'ok',label:'OK',cls:'ok'}}
-async function fetchCsv(){let lastError=null;for(const url of CSV_URLS){try{const sep=url.includes('?')?'&':'?';const res=await fetch(url+sep+'cacheBust='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Erro HTTP '+res.status);const text=await res.text();if(!text||text.toLowerCase().includes('<html'))throw new Error('A resposta nao parece CSV.');return{text,url}}catch(e){lastError=e}}throw lastError||new Error('Nao foi possivel carregar a planilha.')}
-async function loadData(){const box=document.getElementById('statusBox');box.innerHTML='<div class="loader"><span class="spin"></span> Buscando dados da planilha...</div>';try{const data=await fetchCsv();items=mapRows(parseCSV(data.text));lastLoadedAt=new Date();localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:lastLoadedAt.toISOString(),items}));box.innerHTML='<div class="alert success">Base carregada com sucesso: '+items.length+' itens encontrados.</div>';document.getElementById('sourceInfo').textContent=data.url;renderAll()}catch(e){const cached=loadCache();if(cached){items=cached.items;lastLoadedAt=new Date(cached.savedAt);box.innerHTML='<div class="alert">Nao consegui buscar a planilha agora, mas carreguei a ultima base salva neste aparelho. Verifique se a aba esta publicada na web. Detalhe: '+escapeHtml(e.message)+'</div>';renderAll();return}box.innerHTML='<div class="alert danger">Nao foi possivel carregar os dados. Publique a aba BASE_SITE na web em formato CSV ou compartilhe a planilha para leitura. Detalhe: '+escapeHtml(e.message)+'</div>'}}
-function loadCache(){try{const raw=localStorage.getItem(CACHE_KEY);if(!raw)return null;const data=JSON.parse(raw);return data&&Array.isArray(data.items)?data:null}catch{return null}}
-function renderStats(){const total=items.length,zero=items.filter(i=>getStatus(i).key==='zero').length,baixo=items.filter(i=>getStatus(i).key==='baixo').length,excesso=items.filter(i=>getStatus(i).key==='excesso').length;document.getElementById('stats').innerHTML=`<div class="card stat"><b>${total}</b><span>itens cadastrados</span></div><div class="card stat"><b>${baixo}</b><span>baixo estoque</span></div><div class="card stat"><b>${zero}</b><span>itens zerados</span></div><div class="card stat"><b>${excesso}</b><span>acima do maximo</span></div>`;document.getElementById('lastUpdate').textContent=lastLoadedAt?'Ultima atualizacao: '+lastLoadedAt.toLocaleString('pt-BR'):'Aguardando atualizacao'}
-function renderSectorSelect(){const sectors=[...new Set(items.map(i=>i.setor||'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));const sel=document.getElementById('sectorSelect');sel.innerHTML='<option value="todos">Todos os setores</option>'+sectors.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');sel.value=activeSector}
-function filteredItems(){const q=normalize(document.getElementById('searchStock').value);return items.filter(i=>{const st=getStatus(i).key;const text=!q||normalize(`${i.setor} ${i.codigo} ${i.produto} ${i.observacao}`).includes(q);const sector=activeSector==='todos'||i.setor===activeSector;const filt=filter==='todos'||filter===st;return text&&sector&&filt}).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'))}
-function renderStock(){const box=document.getElementById('stockList'),arr=filteredItems();if(!arr.length){box.innerHTML='<div class="empty">Nenhum item encontrado com esse filtro.</div>';return}box.innerHTML=arr.map(i=>{const st=getStatus(i);return `<div class="item ${st.cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem codigo')} - ${escapeHtml(i.setor||'GERAL')} ${i.unidade?' - '+escapeHtml(i.unidade):''}</div><div class="meta"><span class="badge ${st.cls}">${st.label}</span><span class="badge">min: ${fmt(i.minimo)}</span><span class="badge">max: ${fmt(i.maximo)}</span></div>${i.observacao?`<div class="hint" style="margin-top:7px">${escapeHtml(i.observacao)}</div>`:''}</div><div class="qty">${fmt(i.qtd)}<small>em estoque</small></div></div>`}).join('')}
-function shoppingItems(){return items.filter(i=>['zero','baixo'].includes(getStatus(i).key)).sort((a,b)=>{const az=getStatus(a).key==='zero'?0:1,bz=getStatus(b).key==='zero'?0:1;if(az!==bz)return az-bz;return a.produto.localeCompare(b.produto,'pt-BR')})}
-function suggestedBuy(i){const q=Number(i.qtd||0),mi=Number(i.minimo||0),ma=Number(i.maximo||0);if(ma>0&&ma>q)return ma-q;if(mi>0&&mi>q)return mi-q;return q<=0?1:0}
-function renderShoppingList(){const box=document.getElementById('shoppingList'),arr=shoppingItems();if(!arr.length){box.innerHTML='<div class="empty">Nenhum item abaixo do minimo ou zerado.</div>';return}box.innerHTML=arr.map(i=>{const st=getStatus(i);return `<div class="item ${st.cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem codigo')} - ${escapeHtml(i.setor||'GERAL')}</div><div class="meta"><span class="badge ${st.cls}">${st.label}</span><span class="badge">atual: ${fmt(i.qtd)}</span><span class="badge">min: ${fmt(i.minimo)}</span><span class="badge">max: ${fmt(i.maximo)}</span></div></div><div class="qty">${fmt(suggestedBuy(i))}<small>sugestao</small></div></div>`}).join('')}
-function renderSectorCards(){const box=document.getElementById('sectorCards'),sectors=[...new Set(items.map(i=>i.setor||'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));if(!sectors.length){box.innerHTML='<div class="empty">Nenhum setor encontrado.</div>';return}box.innerHTML=sectors.map(sector=>{const arr=items.filter(i=>(i.setor||'GERAL')===sector),total=arr.length,zero=arr.filter(i=>getStatus(i).key==='zero').length,baixo=arr.filter(i=>getStatus(i).key==='baixo').length,crit=zero+baixo,pct=total?Math.round(crit/total*100):0;return `<div class="setorCard"><div class="setorTop"><div><div class="setorTitle">${escapeHtml(sector)}</div><div class="hint">${total} itens - ${crit} criticos</div></div><div class="setorNumber">${pct}%</div></div><div class="progress"><span style="width:${Math.min(100,pct)}%"></span></div><div class="meta"><span class="badge zero">zerados: ${zero}</span><span class="badge low">baixos: ${baixo}</span><span class="badge ok">ok: ${arr.filter(i=>getStatus(i).key==='ok').length}</span></div></div>`}).join('')}
-function exportShoppingList(){const arr=shoppingItems();if(!arr.length){alert('Nao ha itens para comprar.');return}const rows=[['setor','codigo','produto','qtd_atual','minimo','maximo','sugestao_compra','unidade','observacao'],...arr.map(i=>[i.setor,i.codigo,i.produto,i.qtd,i.minimo,i.maximo,suggestedBuy(i),i.unidade,i.observacao])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lista_de_compras.csv';a.click();URL.revokeObjectURL(a.href)}
-function setFilter(btn,f){filter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderStock()}
-function go(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');if(id==='compras')renderShoppingList();if(id==='setores')renderSectorCards();window.scrollTo({top:0,behavior:'smooth'})}
-function renderAll(){renderStats();renderSectorSelect();renderStock();renderShoppingList();renderSectorCards()}
-document.getElementById('searchStock').addEventListener('input',renderStock);document.getElementById('sectorSelect').addEventListener('change',function(){activeSector=this.value;renderStock()});loadData();
-</script>
+    <section id="telaEstoque" class="screen active">
+      <div class="toolbar">
+        <input id="searchStock" class="field" type="search" placeholder="Buscar por código, produto ou setor..." autocomplete="off" />
+        <select id="sectorFilter" class="field"></select>
+      </div>
+
+      <div class="chips">
+        <button class="chip active" type="button" data-filter="todos">Tudo</button>
+        <button class="chip" type="button" data-filter="ok">OK</button>
+        <button class="chip" type="button" data-filter="baixo">Baixo</button>
+        <button class="chip" type="button" data-filter="zero">Zerado</button>
+        <button class="chip" type="button" data-filter="excesso">Acima do máx.</button>
+      </div>
+
+      <div id="stockList" class="list"></div>
+    </section>
+
+    <section id="telaMovimento" class="screen">
+      <div class="card">
+        <h2>Entrada e saída</h2>
+        <p class="hint">Use esta tela para lançar compra, consumo, perda, ajuste ou saída de produção. A quantidade será atualizada direto na aba BASE_SITE.</p>
+
+        <form id="movementForm" class="form">
+          <label for="movSearch">Buscar produto</label>
+          <input id="movSearch" class="field" type="search" placeholder="Digite para filtrar a lista..." autocomplete="off" />
+
+          <label for="movItem">Produto</label>
+          <select id="movItem" class="field" required></select>
+
+          <div class="two">
+            <div>
+              <label for="movType">Tipo</label>
+              <select id="movType" class="field" required>
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
+            <div>
+              <label for="movQty">Quantidade</label>
+              <input id="movQty" class="field" type="number" min="0" step="0.001" placeholder="0" required />
+            </div>
+          </div>
+
+          <label for="movNote">Observação</label>
+          <textarea id="movNote" class="field" placeholder="Ex.: compra, produção, perda, ajuste manual..."></textarea>
+
+          <button class="btn ok" type="submit">Salvar movimentação</button>
+          <div id="movMsg"></div>
+        </form>
+      </div>
+
+      <div class="card mt">
+        <h2>Últimas movimentações</h2>
+        <div id="historyList" class="list compact"></div>
+      </div>
+    </section>
+
+    <section id="telaNovo" class="screen">
+      <div class="card">
+        <h2>Adicionar novo item</h2>
+        <p class="hint">O novo produto será incluído no final da aba BASE_SITE e também registrado no histórico.</p>
+
+        <form id="addForm" class="form">
+          <div class="two">
+            <div>
+              <label for="newSetor">Setor</label>
+              <input id="newSetor" class="field" placeholder="Ex.: MERCADO" required />
+            </div>
+            <div>
+              <label for="newCodigo">Código</label>
+              <input id="newCodigo" class="field" placeholder="Ex.: MP999" />
+            </div>
+          </div>
+
+          <label for="newProduto">Produto</label>
+          <input id="newProduto" class="field" placeholder="Nome do produto" required />
+
+          <div class="three">
+            <div>
+              <label for="newQtd">Qtd inicial</label>
+              <input id="newQtd" class="field" type="number" min="0" step="0.001" value="0" />
+            </div>
+            <div>
+              <label for="newMin">Mínimo</label>
+              <input id="newMin" class="field" type="number" min="0" step="0.001" value="1" />
+            </div>
+            <div>
+              <label for="newMax">Máximo</label>
+              <input id="newMax" class="field" type="number" min="0" step="0.001" value="10" />
+            </div>
+          </div>
+
+          <div class="two">
+            <div>
+              <label for="newUnidade">Unidade</label>
+              <input id="newUnidade" class="field" placeholder="un, kg, pct..." value="un" />
+            </div>
+            <div>
+              <label for="newObs">Observação</label>
+              <input id="newObs" class="field" placeholder="Opcional" />
+            </div>
+          </div>
+
+          <button class="btn" type="submit">Cadastrar item</button>
+          <div id="addMsg"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="telaCompras" class="screen">
+      <div class="card">
+        <h2>Lista de compras</h2>
+        <p class="hint">Itens zerados ou abaixo do mínimo. A sugestão de compra calcula quanto falta para chegar ao máximo.</p>
+        <button id="btnExportShopping" class="btn secondary" type="button">Exportar CSV</button>
+      </div>
+      <div id="shoppingList" class="list"></div>
+    </section>
+
+    <section id="telaConfig" class="screen">
+      <div class="card">
+        <h2>Configuração</h2>
+        <p class="hint">Para entrada, saída e cadastro funcionarem, cole a URL do Web App do Google Apps Script no arquivo <b>js/app.js</b>, na variável <b>API_URL</b>.</p>
+        <div class="codebox">const API_URL = 'COLE_AQUI_A_URL_DO_APPS_SCRIPT';</div>
+      </div>
+
+      <div class="card mt">
+        <h2>Base esperada</h2>
+        <p class="hint">A aba BASE_SITE precisa ter este cabeçalho:</p>
+        <div class="codebox">setor | codigo | produto | qtd | minimo | maximo | unidade | observacao</div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav active" type="button" data-screen="telaEstoque">Estoque</button>
+    <button class="nav" type="button" data-screen="telaMovimento">Entrada/Saída</button>
+    <button class="nav" type="button" data-screen="telaNovo">Novo</button>
+    <button class="nav" type="button" data-screen="telaCompras">Compras</button>
+    <button class="nav" type="button" data-screen="telaConfig">Config</button>
+  </nav>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
