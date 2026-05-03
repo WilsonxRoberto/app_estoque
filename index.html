@@ -1,269 +1,105 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
-  <title>Estoque Offline - Entrada, Saída e Produção</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>Controle de Estoque</title>
   <style>
-    :root{
-      --bg:#f3f4f6;--panel:#ffffff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;
-      --brand:#111827;--brand2:#374151;--ok:#047857;--warn:#b45309;--bad:#b91c1c;--soft:#f9fafb;
-      --radius:18px;--shadow:0 14px 35px rgba(17,24,39,.10);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-    body{padding-bottom:92px}
-    .wrap{max-width:1080px;margin:0 auto;padding:16px}
-    header{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:18px 16px;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:var(--shadow)}
-    header .top{display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:1080px;margin:auto}
-    h1{font-size:22px;margin:0;letter-spacing:-.02em}.sub{opacity:.82;font-size:13px;margin-top:4px}
-    .pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
-    .grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin-top:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}.stat b{display:block;font-size:23px}.stat span{font-size:12px;color:var(--muted)}
-    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);z-index:20}.tab{border:0;background:#f3f4f6;color:#111827;border-radius:14px;padding:11px 8px;font-weight:700;font-size:12px}.tab.active{background:#111827;color:#fff}
-    .toolbar{display:grid;grid-template-columns:1fr auto;gap:10px;margin:14px 0}.search{width:100%;border:1px solid var(--line);border-radius:16px;padding:15px 14px;font-size:16px;background:#fff;outline:none}.search:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.10)}
-    .btn{border:0;border-radius:14px;padding:12px 14px;font-weight:800;font-size:14px;cursor:pointer;background:#111827;color:#fff}.btn.secondary{background:#e5e7eb;color:#111827}.btn.ok{background:var(--ok)}.btn.warn{background:var(--warn)}.btn.bad{background:var(--bad)}.btn.ghost{background:#fff;color:#111827;border:1px solid var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}
-    .chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-weight:700;font-size:13px;white-space:nowrap}.chip.active{background:#111827;color:#fff;border-color:#111827}
-    .list{display:grid;gap:10px;margin-top:12px}.item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.name{font-weight:800;line-height:1.22}.code{font-size:12px;color:var(--muted);margin-top:4px}.qty{font-size:22px;font-weight:900;text-align:right}.qty small{display:block;font-size:11px;color:var(--muted);font-weight:700}.actions{display:flex;gap:6px;grid-column:1/-1;flex-wrap:wrap}.actions .btn{padding:10px 12px;font-size:13px}.zero{border-color:#fecaca;background:#fff7f7}.low{border-color:#fed7aa;background:#fffaf3}
-    .section{display:none}.section.active{display:block}.form{display:grid;gap:10px}.form label{font-size:12px;color:var(--muted);font-weight:800}.form input,.form select,.form textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px;font-size:16px;background:#fff}.form textarea{min-height:70px;resize:vertical}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hint{font-size:12px;color:var(--muted);line-height:1.45}.alert{padding:12px;border-radius:14px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;font-weight:700;font-size:13px}.success{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca}
-    .prodLine{display:grid;grid-template-columns:1fr 96px 40px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff}.prodLine input{padding:10px;border-radius:12px;border:1px solid var(--line);font-size:16px}.mini{font-size:11px;color:var(--muted);margin-top:2px}.hist{border-left:5px solid #d1d5db}.hist.entrada{border-left-color:var(--ok)}.hist.saida,.hist.producao{border-left-color:var(--bad)}.hist .meta{font-size:12px;color:var(--muted);margin-top:6px}.empty{text-align:center;color:var(--muted);padding:28px 10px}.footerTools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.file{display:none}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f3f4f6;border:1px solid var(--line);border-radius:8px;padding:2px 6px}
-    @media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.item{grid-template-columns:1fr 80px}.tabs{grid-template-columns:repeat(4,1fr)}h1{font-size:19px}.wrap{padding:12px}.pill{display:none}}
+    :root{--bg:#f3f4f6;--panel:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#111827;--ok:#047857;--warn:#b45309;--bad:#b91c1c;--blue:#1d4ed8;--shadow:0 14px 35px rgba(17,24,39,.10);--radius:18px}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}body{padding-bottom:92px}button,input,select{font:inherit}.wrap{max-width:1180px;margin:0 auto;padding:16px}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:18px 16px;border-bottom-left-radius:26px;border-bottom-right-radius:26px;box-shadow:var(--shadow)}header .top{display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:1180px;margin:auto}h1{font-size:22px;margin:0;letter-spacing:-.02em}h2{font-size:19px;margin:0 0 10px}.sub{opacity:.84;font-size:13px;margin-top:4px;line-height:1.35}.last{font-size:12px;opacity:.82;margin-top:5px}.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);padding:8px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,1fr);margin-top:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}.stat b{display:block;font-size:25px;line-height:1.05}.stat span{font-size:12px;color:var(--muted)}
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);z-index:20}.tab{border:0;background:#f3f4f6;color:#111827;border-radius:14px;padding:11px 8px;font-weight:800;font-size:12px;cursor:pointer}.tab.active{background:#111827;color:#fff}
+    .toolbar{display:grid;grid-template-columns:1fr 240px auto;gap:10px;margin:14px 0}.search,.select{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;font-size:16px;background:#fff;outline:none}.search:focus,.select:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.10)}
+    .btn{border:0;border-radius:14px;padding:12px 14px;font-weight:900;font-size:14px;cursor:pointer;background:#111827;color:#fff;min-height:46px}.btn.secondary{background:#e5e7eb;color:#111827}.btn.blue{background:var(--blue)}.btn.ghost{background:#fff;color:#111827;border:1px solid var(--line)}
+    .chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin:8px 0 10px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:13px;white-space:nowrap;cursor:pointer}.chip.active{background:#111827;color:#fff;border-color:#111827}
+    .section{display:none}.section.active{display:block}.list{display:grid;gap:10px;margin-top:12px}.item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.item.zero{border-color:#fecaca;background:#fff7f7}.item.low{border-color:#fed7aa;background:#fffaf3}.item.extra{border-color:#bfdbfe;background:#eff6ff}.name{font-weight:900;line-height:1.22}.code{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}.qty{font-size:24px;font-weight:950;text-align:right}.qty small{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-top:2px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;margin-top:7px;border:1px solid var(--line);background:#f9fafb}.badge.ok{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.badge.low{background:#fffbeb;color:#92400e;border-color:#fde68a}.badge.zero{background:#fef2f2;color:#991b1b;border-color:#fecaca}.badge.extra{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}.meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+    .empty{text-align:center;color:var(--muted);padding:28px 10px;background:#fff;border:1px dashed var(--line);border-radius:18px}.alert{padding:12px;border-radius:14px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;font-weight:750;font-size:13px;line-height:1.45}.alert.success{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.alert.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca}.hint{font-size:13px;color:var(--muted);line-height:1.5}.setorCard{display:grid;gap:8px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 18px rgba(17,24,39,.05)}.setorTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.setorTitle{font-weight:950}.setorNumber{font-size:24px;font-weight:950}.progress{height:9px;background:#eef2f7;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:#111827;border-radius:999px}.smallActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.loader{display:flex;align-items:center;gap:10px;color:#374151;font-weight:850}.spin{width:18px;height:18px;border-radius:50%;border:3px solid #d1d5db;border-top-color:#111827;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr}.item{grid-template-columns:1fr 86px}h1{font-size:19px}.wrap{padding:12px}.pill{display:none}.btn{width:100%}.smallActions .btn{width:auto;flex:1}}
   </style>
 </head>
 <body>
 <header>
   <div class="top">
-    <div><h1>Controle de Estoque Offline</h1><div class="sub">Entrada, saída e separação de itens para produção</div></div>
-    <div class="pill">Funciona sem internet depois de aberto</div>
+    <div><h1>Controle de Estoque</h1><div class="sub">Base conectada a planilha Google - aba BASE_SITE</div><div id="lastUpdate" class="last">Carregando dados...</div></div>
+    <div class="pill">Celular - Tablet - Computador</div>
   </div>
 </header>
 <main class="wrap">
+  <div id="statusBox" class="card"><div class="loader"><span class="spin"></span> Buscando dados da planilha...</div></div>
   <section class="grid stats" id="stats"></section>
 
   <section id="estoque" class="section active">
     <div class="toolbar">
-      <input id="searchStock" class="search" placeholder="Buscar por código ou produto..." autocomplete="off" />
-      <button class="btn secondary" onclick="showAddForm()">+ Novo item</button>
+      <input id="searchStock" class="search" placeholder="Buscar por codigo, produto ou setor..." autocomplete="off">
+      <select id="sectorSelect" class="select"></select>
+      <button class="btn blue" onclick="loadData(true)">Atualizar</button>
     </div>
     <div class="chips">
-      <button class="chip active" data-filter="todos" onclick="setFilter(this,'todos')">Tudo</button>
-      <button class="chip" data-filter="com" onclick="setFilter(this,'com')">Com estoque</button>
-      <button class="chip" data-filter="baixo" onclick="setFilter(this,'baixo')">Baixo estoque</button>
-      <button class="chip" data-filter="zero" onclick="setFilter(this,'zero')">Zerados</button>
-    </div>
-    <div class="footerTools">
-      <button class="btn ghost" onclick="document.getElementById('csvFile').click()">Importar CSV</button>
-      <button class="btn ghost" onclick="exportInventory()">Exportar estoque</button>
-      <button class="btn ghost" onclick="exportHistory()">Exportar histórico</button>
-      <button class="btn bad" onclick="resetBase()">Restaurar base inicial</button>
-      <input id="csvFile" class="file" type="file" accept=".csv,text/csv" onchange="importCSV(event)" />
+      <button class="chip active" onclick="setFilter(this,'todos')">Tudo</button>
+      <button class="chip" onclick="setFilter(this,'ok')">OK</button>
+      <button class="chip" onclick="setFilter(this,'baixo')">Baixo estoque</button>
+      <button class="chip" onclick="setFilter(this,'zero')">Zerados</button>
+      <button class="chip" onclick="setFilter(this,'excesso')">Acima do maximo</button>
     </div>
     <div id="stockList" class="list"></div>
   </section>
 
-  <section id="producao" class="section">
-    <div class="card">
-      <div class="form">
-        <label>Buscar item para usar na produção</label>
-        <input id="searchProd" class="search" placeholder="Digite açúcar, leite, MP309..." autocomplete="off" />
-        <div id="prodSuggestions" class="list"></div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:0 0 8px;font-size:18px">Lista da produção</h2>
-      <div class="hint">Adicione os produtos que serão consumidos. Ao finalizar, o sistema baixa automaticamente do estoque e grava no histórico.</div>
-      <div id="productionCart" class="list"></div>
-      <div class="row2" style="margin-top:12px">
-        <input id="productionName" class="search" placeholder="Nome da produção/receita/opcional" />
-        <button class="btn bad" onclick="finishProduction()">Finalizar e baixar estoque</button>
-      </div>
-    </div>
+  <section id="compras" class="section">
+    <div class="card"><h2>Lista de compras automatica</h2><div class="hint">Mostra produtos zerados ou abaixo do minimo. A sugestao de compra calcula quanto falta para chegar ao maximo.</div><div class="smallActions"><button class="btn ghost" onclick="exportShoppingList()">Exportar lista</button><button class="btn secondary" onclick="window.print()">Imprimir</button></div></div>
+    <div id="shoppingList" class="list"></div>
   </section>
 
-  <section id="mov" class="section">
-    <div class="card">
-      <h2 style="margin:0 0 10px;font-size:18px">Lançar entrada ou saída</h2>
-      <div class="form">
-        <label>Produto</label>
-        <select id="movItem"></select>
-        <div class="row2">
-          <div><label>Tipo</label><select id="movType"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
-          <div><label>Quantidade</label><input id="movQty" type="number" min="0" step="0.001" placeholder="0" /></div>
-        </div>
-        <label>Observação</label>
-        <textarea id="movNote" placeholder="Ex.: compra, ajuste, perda, produção... opcional"></textarea>
-        <button class="btn ok" onclick="applyMovement()">Salvar movimentação</button>
-        <div id="movMsg"></div>
-      </div>
-    </div>
-    <div class="card" id="addForm" style="display:none;margin-top:12px">
-      <h2 style="margin:0 0 10px;font-size:18px">Cadastrar novo item</h2>
-      <div class="form">
-        <div class="row2"><div><label>Código</label><input id="newCode" placeholder="Ex.: MP999" /></div><div><label>Qtd inicial</label><input id="newQty" type="number" step="0.001" value="0" /></div></div>
-        <label>Produto</label><input id="newProduct" placeholder="Nome do produto" />
-        <button class="btn" onclick="addNewItem()">Cadastrar item</button>
-      </div>
-    </div>
+  <section id="setores" class="section">
+    <div class="card"><h2>Resumo por setor</h2><div class="hint">Veja quais setores tem mais itens criticos, zerados ou abaixo do minimo.</div></div>
+    <div id="sectorCards" class="grid" style="margin-top:12px"></div>
   </section>
 
-  <section id="historico" class="section">
-    <div class="toolbar">
-      <input id="searchHist" class="search" placeholder="Buscar no histórico..." autocomplete="off" />
-      <button class="btn bad" onclick="clearHistory()">Limpar histórico</button>
-    </div>
-    <div id="historyList" class="list"></div>
+  <section id="ajuda" class="section">
+    <div class="card"><h2>Configuracao da planilha</h2><p class="hint">Este sistema le a aba configurada da sua planilha. A aba precisa ter o cabecalho abaixo:</p><div class="alert">setor | codigo | produto | qtd | minimo | maximo | unidade | observacao</div><p class="hint">Se no GitHub Pages aparecer erro ao carregar, publique a aba BASE_SITE na web em formato CSV: Arquivo > Compartilhar > Publicar na Web.</p></div>
+    <div class="card" style="margin-top:12px"><h2>Proxima fase</h2><p class="hint">Esta versao consulta a planilha e gera lista de compras. Depois podemos adicionar entrada, saida, producao e historico gravando direto na planilha com Google Apps Script.</p></div>
+    <div class="card" style="margin-top:12px"><h2>Fonte de dados</h2><p class="hint" id="sourceInfo"></p></div>
   </section>
 </main>
 <nav class="tabs">
   <button class="tab active" onclick="go('estoque',this)">Estoque</button>
-  <button class="tab" onclick="go('producao',this)">Produção</button>
-  <button class="tab" onclick="go('mov',this)">Entrada/Saída</button>
-  <button class="tab" onclick="go('historico',this)">Histórico</button>
+  <button class="tab" onclick="go('compras',this)">Compras</button>
+  <button class="tab" onclick="go('setores',this)">Setores</button>
+  <button class="tab" onclick="go('ajuda',this)">Ajuda</button>
 </nav>
 <script>
-const BASE_ITEMS = [
- {codigo:'MP009',produto:'ACUCAR CRISTAL',qtd:5},
- {codigo:'MP013',produto:'AÇÚCAR REFINADO 1 kG (UNIÃO)',qtd:40},
- {codigo:'MP_082',produto:'AGUA 1,5 LTi',qtd:6},
- {codigo:'MP_002',produto:'AGUA DE COCO',qtd:0},
- {codigo:'LDE001',produto:'ALCOOL',qtd:9},
- {codigo:'MP007',produto:'AMIDO DE MILHO 100G',qtd:2},
- {codigo:'MP907',produto:'BISC MARILAN MINI MAISENA 350G',qtd:0},
- {codigo:'MP032',produto:'CAFE',qtd:6},
- {codigo:'MP553',produto:'CAFÉ SOLUVEL',qtd:2},
- {codigo:'LDE051',produto:'Cândida',qtd:1},
- {codigo:'55845',produto:'CHANDON MINI',qtd:0},
- {codigo:'ES002',produto:'CHANDON 750ML',qtd:0},
- {codigo:'CF014',produto:'COCA NORMAL',qtd:24},
- {codigo:'CF015',produto:'COCA ZERO',qtd:24},
- {codigo:'MP089',produto:'COCO SWEET5 kg',qtd:4},
- {codigo:'MP139',produto:'CREAM CHESSE',qtd:1},
- {codigo:'MP140',produto:'CREME DE LEITE 1 LITRO CX culin.',qtd:84},
- {codigo:'MP585',produto:'CREME DE LEITE 200ML 0 LACTOSE',qtd:1},
- {codigo:'LDE056',produto:'DESENFETANTE',qtd:2},
- {codigo:'LDE007',produto:'DETERGENTE',qtd:4},
- {codigo:'LDE046',produto:'ESPONJA DE LIMPEZA',qtd:15},
- {codigo:'MP167',produto:'FARINHA pct 5 kg',qtd:40},
- {codigo:'LDE021',produto:'FILTRO CAFE',qtd:4},
- {codigo:'MP008',produto:'FR C AMORA',qtd:5},
- {codigo:'MP591',produto:'COCO FITA 1KG CONGELADO',qtd:0},
- {codigo:'MP591',produto:'FR C COCO CONG RALADO',qtd:0},
- {codigo:'MP564',produto:'FR C FRAMBOESA',qtd:5},
- {codigo:'MP324',produto:'MARACUJA CONGELADO POLPA 1 KG',qtd:5},
- {codigo:'MP582',produto:'FR C MIRTILO',qtd:0},
- {codigo:'MP343',produto:'FR C MORANGO',qtd:3},
- {codigo:'MP324',produto:'FR C POUPA DE MARACUJA',qtd:5},
- {codigo:'MP275',produto:'GELATINA SEM SABOR',qtd:0},
- {codigo:'CF016',produto:'GUARANA',qtd:12},
- {codigo:'MP550',produto:'GUARDANAPO KITCH',qtd:4},
- {codigo:'LDE023',produto:'GUARDANAPO PP LOJA',qtd:10},
- {codigo:'CF_783',produto:'HIDROTERIL',qtd:0},
- {codigo:'MP309',produto:'LEITE CONDENSADO MOÇA',qtd:244},
- {codigo:'MP_87',produto:'LEITE DE COCO',qtd:5},
- {codigo:'MP312',produto:'LEITE INTEGRAL',qtd:24},
- {codigo:'MP603',produto:'LEITE ZERO LACTOSE',qtd:1},
- {codigo:'MP138',produto:'MACARRAO FURADO',qtd:1},
- {codigo:'MP321',produto:'MAGUARY CON MARACUJÁ 500ML',qtd:5},
- {codigo:'MP_83',produto:'MASSA FOLHADA MASSA LEVE',qtd:3},
- {codigo:'MP381',produto:'milho 400G',qtd:6},
- {codigo:'MP313',produto:'NINHO 1KG',qtd:4},
- {codigo:'MP349',produto:'OLEO DE MILHO',qtd:5},
- {codigo:'MP350',produto:'OLEO SOYA',qtd:15},
- {codigo:'MP376',produto:'paçoca 1,7 kg',qtd:1},
- {codigo:'MP011',produto:'acucar gelado',qtd:1},
- {codigo:'MP545',produto:'ACIDO CITRICO',qtd:0},
- {codigo:'MP012',produto:'ACUCAR MASCAVO',qtd:6},
- {codigo:'MP_182',produto:'BANHA VEGETAL',qtd:0},
- {codigo:'MP024',produto:'BEXIGA ZERINHO',qtd:16},
- {codigo:'MP370',produto:'BLEND DE LIMAO SICILIANO',qtd:1},
- {codigo:'MP371',produto:'BLEND PISTACHE',qtd:1},
- {codigo:'MP374',produto:'BLEND FRUTAS VERMELHAS',qtd:0},
- {codigo:'MP516',produto:'BT53 DOCE CIRCULAR ART TART',qtd:0},
- {codigo:'MP034',produto:'CANELA EM PÓ',qtd:1},
- {codigo:'MP517',produto:'CHANTILY NORCAU 1 LT',qtd:16},
- {codigo:'EM052',produto:'COLHER MINI PLÁSTICO PICCOLO petit)',qtd:5},
- {codigo:'MP_059',produto:'CORANTE MAÇA MAGENTA GRAND CHEF 30G',qtd:0},
- {codigo:'PM103',produto:'MAGO PÓ NACAR 8G',qtd:0},
- {codigo:'MP141',produto:'CROCANTE DE CAJU',qtd:0},
- {codigo:'PM145',produto:'DESMOLDANTE SPRAY 600 ML',qtd:2},
- {codigo:'PM057',produto:'DIOXIDO DE TITANIO',qtd:0},
- {codigo:'MP159',produto:'ESSÊNCIA DE BAUNILHA BRANCA 1 L',qtd:1},
- {codigo:'MP588',produto:'FEULLETINE DA CALLEBAUT.',qtd:0},
- {codigo:'MP590',produto:'FLOR DE SAL',qtd:2},
- {codigo:'PM136',produto:'FONDANT MIX',qtd:3},
- {codigo:'EM256',produto:'FORMA DE CUP CAKE',qtd:12},
- {codigo:'EM257',produto:'FORMINHA GIULIANA FLORES',qtd:2},
- {codigo:'MP_68',produto:'FORMINHA MARROM Nº 2 - BRU 45U',qtd:10},
- {codigo:'MP7_1',produto:'FORMINHA MARROM Nº 4 - BRU 100U',qtd:25},
- {codigo:'MP_538',produto:'FORMINHA MARROM Nº 6 GIUL 100U',qtd:5},
- {codigo:'LDE022',produto:'GAS MACARICO',qtd:3},
- {codigo:'MP275',produto:'GELATINA 1KG',qtd:0},
- {codigo:'MP_SBA001',produto:'GELEIA DE BRILHO SOFT GEL',qtd:1},
- {codigo:'',produto:'GLACE REAL',qtd:1},
- {codigo:'157112',produto:'GRANULADO MACIO DONA J 1 KG',qtd:0},
- {codigo:'MP281',produto:'GRANULADO MACIO GIULIANA FLORES',qtd:1},
- {codigo:'MP0680',produto:'GRANULE MELK CARAMELO',qtd:0},
- {codigo:'MP1_164',produto:'GRANULADO MELK AMARGO',qtd:0},
- {codigo:'MP_201',produto:'GRANULADO MELK AO LEITE',qtd:6},
- {codigo:'MP0679',produto:'GRANULADO MELK BRANCO',qtd:6},
- {codigo:'MP1_443',produto:'GRANULADO MELK 70 % AMARGO',qtd:15},
- {codigo:'MP282',produto:'GRANULADO VERMICILLI 400 G',qtd:0},
- {codigo:'MP332',produto:'M&M',qtd:0},
- {codigo:'PM103',produto:'MAGO PÓ NACAR 8G',qtd:0},
- {codigo:'MP063',produto:'MELK 50% CHOC PÓ',qtd:5},
- {codigo:'MP326',produto:'MEL FAVINHO',qtd:4},
- {codigo:'MP336',produto:'MICANGA BRANCA',qtd:5},
- {codigo:'MP337',produto:'MICANGA COLORIDA',qtd:1},
- {codigo:'MP329',produto:'MINI CONE MARVI',qtd:30},
- {codigo:'MP_057',produto:'MIX ESPECIARIAS',qtd:8},
- {codigo:'MP344',produto:'MORANGO TROPICAL',qtd:1},
- {codigo:'MP345',produto:'NEGRESCO TOPPING',qtd:1},
- {codigo:'MP_159',produto:'CREME DE AVELA',qtd:0},
- {codigo:'MP348',produto:'NUTELLA 3 KG',qtd:0},
- {codigo:'MP376',produto:'PACOCA 1,7 KG',qtd:1}
+const SHEET_ID='1WkmVkfNAu83_Sc7AfFnofP-1oSpdJxdjOmlyTcLcvTc';
+const SHEET_GID='247051946';
+const CACHE_KEY='controle_estoque_base_site_cache_v1';
+const CSV_URLS=[
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`,
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`
 ];
-const LS_ITEMS='estoque_offline_items_v1', LS_HIST='estoque_offline_hist_v1';
-let items=[], history=[], filter='todos', cart=[];
-function uid(){return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+let items=[],filter='todos',activeSector='todos',lastLoadedAt=null;
 function normalize(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
-function fmt(n){const x=Number(n||0); return Number.isInteger(x)?String(x):x.toLocaleString('pt-BR',{maximumFractionDigits:3})}
-function seed(){return BASE_ITEMS.map((it,i)=>({...it,id:uid()+'_'+i,min:0,qtd:Number(it.qtd)||0}))}
-function load(){items=JSON.parse(localStorage.getItem(LS_ITEMS)||'null')||seed(); history=JSON.parse(localStorage.getItem(LS_HIST)||'[]'); save(); renderAll()}
-function save(){localStorage.setItem(LS_ITEMS,JSON.stringify(items)); localStorage.setItem(LS_HIST,JSON.stringify(history))}
-function addHist(type,item,qty,note,extra={}){history.unshift({id:uid(),type,codigo:item.codigo,produto:item.produto,qty:Number(qty),note:note||'',date:new Date().toISOString(),...extra}); if(history.length>1500)history=history.slice(0,1500)}
-function renderStats(){const total=items.length, zerados=items.filter(i=>Number(i.qtd)<=0).length, baixo=items.filter(i=>Number(i.qtd)>0 && Number(i.qtd)<=5).length, saldo=items.reduce((a,b)=>a+Number(b.qtd||0),0); document.getElementById('stats').innerHTML=`<div class="card stat"><b>${total}</b><span>itens cadastrados</span></div><div class="card stat"><b>${fmt(saldo)}</b><span>saldo total</span></div><div class="card stat"><b>${baixo}</b><span>baixo estoque</span></div><div class="card stat"><b>${zerados}</b><span>itens zerados</span></div>`}
-function filteredItems(q){q=normalize(q); return items.filter(i=>{const match=!q||normalize(i.codigo+' '+i.produto).includes(q); const qtd=Number(i.qtd||0); const byFilter=filter==='todos'||(filter==='com'&&qtd>0)||(filter==='zero'&&qtd<=0)||(filter==='baixo'&&qtd>0&&qtd<=5); return match&&byFilter}).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'))}
-function renderStock(){const box=document.getElementById('stockList'); const q=document.getElementById('searchStock').value; const arr=filteredItems(q); if(!arr.length){box.innerHTML='<div class="empty">Nenhum item encontrado.</div>';return} box.innerHTML=arr.map(i=>{const qtd=Number(i.qtd||0); const cls=qtd<=0?'zero':qtd<=5?'low':'';return `<div class="item ${cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem código')}</div></div><div class="qty">${fmt(qtd)}<small>em estoque</small></div><div class="actions"><button class="btn ok" onclick="quickMove('${i.id}','entrada')">Entrada</button><button class="btn warn" onclick="quickMove('${i.id}','saida')">Saída</button><button class="btn bad" onclick="addToCart('${i.id}')">Usar na produção</button><button class="btn ghost" onclick="editQty('${i.id}')">Ajustar</button></div></div>`}).join('')}
-function renderSelect(){const sel=document.getElementById('movItem'); sel.innerHTML=items.slice().sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR')).map(i=>`<option value="${i.id}">${escapeHtml(i.codigo)} - ${escapeHtml(i.produto)} | qtd: ${fmt(i.qtd)}</option>`).join('')}
-function renderProdSuggestions(){const box=document.getElementById('prodSuggestions'); const q=document.getElementById('searchProd').value; if(!normalize(q)){box.innerHTML='<div class="empty">Digite para buscar itens do estoque.</div>'; return} const arr=items.filter(i=>normalize(i.codigo+' '+i.produto).includes(normalize(q))).slice(0,12); box.innerHTML=arr.length?arr.map(i=>`<div class="item"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem código')} • estoque: ${fmt(i.qtd)}</div></div><button class="btn bad" onclick="addToCart('${i.id}')">Adicionar</button></div>`).join(''):'<div class="empty">Nenhum item encontrado.</div>'}
-function renderCart(){const box=document.getElementById('productionCart'); if(!cart.length){box.innerHTML='<div class="empty">A lista da produção está vazia.</div>';return} box.innerHTML=cart.map(c=>{const it=items.find(i=>i.id===c.id); if(!it)return ''; const insuf=Number(c.qty)>Number(it.qtd); return `<div class="prodLine ${insuf?'danger':''}"><div><b>${escapeHtml(it.produto)}</b><div class="mini">${escapeHtml(it.codigo||'sem código')} • disponível: ${fmt(it.qtd)} ${insuf?'• estoque insuficiente':''}</div></div><input type="number" min="0" step="0.001" value="${c.qty}" onchange="updateCartQty('${c.id}',this.value)"><button class="btn bad" onclick="removeCart('${c.id}')">×</button></div>`}).join('')}
-function renderHistory(){const box=document.getElementById('historyList'); const q=normalize(document.getElementById('searchHist').value); const arr=history.filter(h=>!q||normalize(h.type+' '+h.codigo+' '+h.produto+' '+h.note).includes(q)); if(!arr.length){box.innerHTML='<div class="empty">Nenhuma movimentação encontrada.</div>'; return} box.innerHTML=arr.slice(0,250).map(h=>{const sign=h.type==='entrada'?'+':'-'; const d=new Date(h.date); return `<div class="card hist ${h.type}"><b>${sign}${fmt(h.qty)} • ${escapeHtml(h.produto)}</b><div class="meta">${escapeHtml(h.codigo||'sem código')} • ${labelType(h.type)} • ${d.toLocaleString('pt-BR')}</div>${h.note?`<div class="hint" style="margin-top:6px">${escapeHtml(h.note)}</div>`:''}</div>`}).join('')}
-function labelType(t){return t==='entrada'?'Entrada':t==='saida'?'Saída':'Produção'}
-function renderAll(){renderStats();renderStock();renderSelect();renderProdSuggestions();renderCart();renderHistory()}
-function setFilter(btn,f){filter=f; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); renderStock()}
-function go(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); if(id==='historico')renderHistory(); if(id==='producao')renderProdSuggestions(); window.scrollTo({top:0,behavior:'smooth'})}
-function quickMove(id,type){document.getElementById('movItem').value=id; document.getElementById('movType').value=type; document.getElementById('movQty').focus(); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById('mov').classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab')[2].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'})}
-function applyMovement(){const id=document.getElementById('movItem').value, type=document.getElementById('movType').value, qty=Number(String(document.getElementById('movQty').value).replace(',','.')), note=document.getElementById('movNote').value; const msg=document.getElementById('movMsg'); const it=items.find(i=>i.id===id); if(!it||!qty||qty<=0){msg.innerHTML='<div class="alert danger">Informe produto e quantidade maior que zero.</div>';return} if(type==='saida'&&qty>Number(it.qtd)){msg.innerHTML='<div class="alert danger">Saída maior que o estoque disponível.</div>';return} it.qtd=type==='entrada'?Number(it.qtd)+qty:Number(it.qtd)-qty; addHist(type,it,qty,note); document.getElementById('movQty').value=''; document.getElementById('movNote').value=''; save(); renderAll(); msg.innerHTML='<div class="alert success">Movimentação salva com sucesso.</div>'; setTimeout(()=>msg.innerHTML='',2500)}
-function addToCart(id){const it=items.find(i=>i.id===id); if(!it)return; const found=cart.find(c=>c.id===id); if(found)found.qty=Number(found.qty)+1; else cart.push({id,qty:1}); renderCart(); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById('producao').classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab')[1].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'})}
-function updateCartQty(id,v){const c=cart.find(x=>x.id===id); if(c)c.qty=Math.max(0,Number(String(v).replace(',','.'))||0); renderCart()}
-function removeCart(id){cart=cart.filter(c=>c.id!==id); renderCart()}
-function finishProduction(){const name=document.getElementById('productionName').value.trim(); if(!cart.length){alert('Adicione itens na produção.');return} for(const c of cart){const it=items.find(i=>i.id===c.id); if(!it||Number(c.qty)<=0){alert('Revise as quantidades.');return} if(Number(c.qty)>Number(it.qtd)){alert('Estoque insuficiente para: '+it.produto);return}} cart.forEach(c=>{const it=items.find(i=>i.id===c.id); it.qtd=Number(it.qtd)-Number(c.qty); addHist('producao',it,c.qty,name?'Produção: '+name:'Baixa por produção')}); cart=[]; document.getElementById('productionName').value=''; save(); renderAll(); alert('Produção finalizada e estoque baixado.')}
-function editQty(id){const it=items.find(i=>i.id===id); const val=prompt('Nova quantidade para '+it.produto, it.qtd); if(val===null)return; const n=Number(String(val).replace(',','.')); if(Number.isNaN(n)||n<0){alert('Quantidade inválida.');return} const diff=n-Number(it.qtd); it.qtd=n; addHist(diff>=0?'entrada':'saida',it,Math.abs(diff),'Ajuste manual de saldo'); save(); renderAll()}
-function showAddForm(){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById('mov').classList.add('active'); document.getElementById('addForm').style.display='block'; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab')[2].classList.add('active'); setTimeout(()=>document.getElementById('newCode').focus(),100)}
-function addNewItem(){const codigo=document.getElementById('newCode').value.trim(), produto=document.getElementById('newProduct').value.trim(), qtd=Number(String(document.getElementById('newQty').value).replace(',','.'))||0; if(!produto){alert('Informe o nome do produto.');return} const it={id:uid(),codigo,produto,qtd,min:0}; items.push(it); addHist('entrada',it,qtd,'Cadastro inicial'); document.getElementById('newCode').value='';document.getElementById('newProduct').value='';document.getElementById('newQty').value='0'; save(); renderAll(); alert('Item cadastrado.')}
-function parseCSV(text){const rows=[]; let row=[], cur='', quote=false; for(let i=0;i<text.length;i++){const ch=text[i], nx=text[i+1]; if(ch==='"'&&quote&&nx==='"'){cur+='"';i++;continue} if(ch==='"'){quote=!quote;continue} if((ch===','||ch===';')&&!quote){row.push(cur);cur='';continue} if((ch==='\n'||ch==='\r')&&!quote){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''} if(ch==='\r'&&nx==='\n')i++;continue} cur+=ch} if(cur||row.length){row.push(cur);rows.push(row)} return rows.filter(r=>r.some(c=>String(c).trim()))}
-function importCSV(ev){const file=ev.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=e=>{const rows=parseCSV(e.target.result); if(!rows.length){alert('CSV vazio.');return} const head=rows[0].map(h=>normalize(h)); const idxCode=head.findIndex(h=>['cod','codigo','código','sku'].includes(h)); const idxProd=head.findIndex(h=>['produto','item','descricao','descrição','nome'].includes(h)); const idxQtd=head.findIndex(h=>['qtd','quantidade','saldo','estoque'].includes(h)); if(idxProd<0||idxQtd<0){alert('Não encontrei as colunas produto e qtd/quantidade no CSV.');return} const imported=rows.slice(1).map((r,i)=>({id:uid()+'csv'+i,codigo:(r[idxCode]||'').trim(),produto:(r[idxProd]||'').trim(),qtd:Number(String(r[idxQtd]||'0').replace(',','.'))||0,min:0})).filter(i=>i.produto); if(!imported.length){alert('Nenhum produto válido no CSV.');return} if(confirm('Substituir o estoque atual por '+imported.length+' itens importados?')){items=imported; addHist('entrada',{codigo:'CSV',produto:'Importação de estoque'},imported.length,'Importação CSV substituiu a base anterior'); save(); renderAll(); alert('Estoque importado com sucesso.')} ev.target.value=''}; reader.readAsText(file,'utf-8')}
-function toCSV(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\n')}
-function download(name,content){const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'})); a.download=name; a.click(); URL.revokeObjectURL(a.href)}
-function exportInventory(){download('estoque_atual.csv',toCSV([['cod','produto','qtd'],...items.map(i=>[i.codigo,i.produto,i.qtd])]))}
-function exportHistory(){download('historico_movimentacoes.csv',toCSV([['data','tipo','cod','produto','qtd','observacao'],...history.map(h=>[new Date(h.date).toLocaleString('pt-BR'),labelType(h.type),h.codigo,h.produto,h.qty,h.note])]))}
-function resetBase(){if(confirm('Isso substitui o estoque atual pela base inicial da planilha. Continuar?')){items=seed(); cart=[]; save(); renderAll()}}
-function clearHistory(){if(confirm('Limpar todo o histórico deste aparelho?')){history=[];save();renderAll()}}
+function toNumber(v){let s=String(v??'').trim();if(!s)return 0;s=s.replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:0}
+function fmt(n){const x=Number(n||0);return Number.isInteger(x)?String(x):x.toLocaleString('pt-BR',{maximumFractionDigits:3})}
 function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-document.getElementById('searchStock').addEventListener('input',renderStock);
-document.getElementById('searchProd').addEventListener('input',renderProdSuggestions);
-document.getElementById('searchHist').addEventListener('input',renderHistory);
-load();
+function parseCSV(text){const rows=[];let row=[],cur='',quote=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'&&quote&&nx==='"'){cur+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if((ch===','||ch===';'||ch==='\t')&&!quote){row.push(cur);cur='';continue}if((ch==='\n'||ch==='\r')&&!quote){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=''}if(ch==='\r'&&nx==='\n')i++;continue}cur+=ch}if(cur||row.length){row.push(cur);rows.push(row)}return rows.filter(r=>r.some(c=>String(c).trim()))}
+function mapRows(rows){if(!rows.length)return[];const headers=rows[0].map(h=>normalize(h));const idx=names=>{for(const n of names){const p=headers.indexOf(normalize(n));if(p>=0)return p}return-1};const iSetor=idx(['setor','categoria','grupo']),iCodigo=idx(['codigo','cod','sku']),iProduto=idx(['produto','item','descricao','nome']),iQtd=idx(['qtd','quantidade','saldo','estoque']),iMin=idx(['minimo','min']),iMax=idx(['maximo','max']),iUn=idx(['unidade','und','un']),iObs=idx(['observacao','obs']);if(iProduto<0||iQtd<0)throw new Error('Nao encontrei as colunas produto e qtd.');return rows.slice(1).map((r,i)=>({id:`${r[iCodigo]||'sem-codigo'}_${i}`,setor:String(r[iSetor]||'GERAL').trim()||'GERAL',codigo:String(r[iCodigo]||'').trim(),produto:String(r[iProduto]||'').trim(),qtd:toNumber(r[iQtd]),minimo:iMin>=0?toNumber(r[iMin]):0,maximo:iMax>=0?toNumber(r[iMax]):0,unidade:iUn>=0?String(r[iUn]||'').trim():'',observacao:iObs>=0?String(r[iObs]||'').trim():''})).filter(i=>i.produto)}
+function getStatus(item){const q=Number(item.qtd||0),mi=Number(item.minimo||0),ma=Number(item.maximo||0);if(q<=0)return{key:'zero',label:'Zerado',cls:'zero'};if(mi>0&&q<mi)return{key:'baixo',label:'Baixo estoque',cls:'low'};if(ma>0&&q>ma)return{key:'excesso',label:'Acima do maximo',cls:'extra'};return{key:'ok',label:'OK',cls:'ok'}}
+async function fetchCsv(){let lastError=null;for(const url of CSV_URLS){try{const sep=url.includes('?')?'&':'?';const res=await fetch(url+sep+'cacheBust='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('Erro HTTP '+res.status);const text=await res.text();if(!text||text.toLowerCase().includes('<html'))throw new Error('A resposta nao parece CSV.');return{text,url}}catch(e){lastError=e}}throw lastError||new Error('Nao foi possivel carregar a planilha.')}
+async function loadData(){const box=document.getElementById('statusBox');box.innerHTML='<div class="loader"><span class="spin"></span> Buscando dados da planilha...</div>';try{const data=await fetchCsv();items=mapRows(parseCSV(data.text));lastLoadedAt=new Date();localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:lastLoadedAt.toISOString(),items}));box.innerHTML='<div class="alert success">Base carregada com sucesso: '+items.length+' itens encontrados.</div>';document.getElementById('sourceInfo').textContent=data.url;renderAll()}catch(e){const cached=loadCache();if(cached){items=cached.items;lastLoadedAt=new Date(cached.savedAt);box.innerHTML='<div class="alert">Nao consegui buscar a planilha agora, mas carreguei a ultima base salva neste aparelho. Verifique se a aba esta publicada na web. Detalhe: '+escapeHtml(e.message)+'</div>';renderAll();return}box.innerHTML='<div class="alert danger">Nao foi possivel carregar os dados. Publique a aba BASE_SITE na web em formato CSV ou compartilhe a planilha para leitura. Detalhe: '+escapeHtml(e.message)+'</div>'}}
+function loadCache(){try{const raw=localStorage.getItem(CACHE_KEY);if(!raw)return null;const data=JSON.parse(raw);return data&&Array.isArray(data.items)?data:null}catch{return null}}
+function renderStats(){const total=items.length,zero=items.filter(i=>getStatus(i).key==='zero').length,baixo=items.filter(i=>getStatus(i).key==='baixo').length,excesso=items.filter(i=>getStatus(i).key==='excesso').length;document.getElementById('stats').innerHTML=`<div class="card stat"><b>${total}</b><span>itens cadastrados</span></div><div class="card stat"><b>${baixo}</b><span>baixo estoque</span></div><div class="card stat"><b>${zero}</b><span>itens zerados</span></div><div class="card stat"><b>${excesso}</b><span>acima do maximo</span></div>`;document.getElementById('lastUpdate').textContent=lastLoadedAt?'Ultima atualizacao: '+lastLoadedAt.toLocaleString('pt-BR'):'Aguardando atualizacao'}
+function renderSectorSelect(){const sectors=[...new Set(items.map(i=>i.setor||'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));const sel=document.getElementById('sectorSelect');sel.innerHTML='<option value="todos">Todos os setores</option>'+sectors.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');sel.value=activeSector}
+function filteredItems(){const q=normalize(document.getElementById('searchStock').value);return items.filter(i=>{const st=getStatus(i).key;const text=!q||normalize(`${i.setor} ${i.codigo} ${i.produto} ${i.observacao}`).includes(q);const sector=activeSector==='todos'||i.setor===activeSector;const filt=filter==='todos'||filter===st;return text&&sector&&filt}).sort((a,b)=>a.produto.localeCompare(b.produto,'pt-BR'))}
+function renderStock(){const box=document.getElementById('stockList'),arr=filteredItems();if(!arr.length){box.innerHTML='<div class="empty">Nenhum item encontrado com esse filtro.</div>';return}box.innerHTML=arr.map(i=>{const st=getStatus(i);return `<div class="item ${st.cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem codigo')} - ${escapeHtml(i.setor||'GERAL')} ${i.unidade?' - '+escapeHtml(i.unidade):''}</div><div class="meta"><span class="badge ${st.cls}">${st.label}</span><span class="badge">min: ${fmt(i.minimo)}</span><span class="badge">max: ${fmt(i.maximo)}</span></div>${i.observacao?`<div class="hint" style="margin-top:7px">${escapeHtml(i.observacao)}</div>`:''}</div><div class="qty">${fmt(i.qtd)}<small>em estoque</small></div></div>`}).join('')}
+function shoppingItems(){return items.filter(i=>['zero','baixo'].includes(getStatus(i).key)).sort((a,b)=>{const az=getStatus(a).key==='zero'?0:1,bz=getStatus(b).key==='zero'?0:1;if(az!==bz)return az-bz;return a.produto.localeCompare(b.produto,'pt-BR')})}
+function suggestedBuy(i){const q=Number(i.qtd||0),mi=Number(i.minimo||0),ma=Number(i.maximo||0);if(ma>0&&ma>q)return ma-q;if(mi>0&&mi>q)return mi-q;return q<=0?1:0}
+function renderShoppingList(){const box=document.getElementById('shoppingList'),arr=shoppingItems();if(!arr.length){box.innerHTML='<div class="empty">Nenhum item abaixo do minimo ou zerado.</div>';return}box.innerHTML=arr.map(i=>{const st=getStatus(i);return `<div class="item ${st.cls}"><div><div class="name">${escapeHtml(i.produto)}</div><div class="code">${escapeHtml(i.codigo||'sem codigo')} - ${escapeHtml(i.setor||'GERAL')}</div><div class="meta"><span class="badge ${st.cls}">${st.label}</span><span class="badge">atual: ${fmt(i.qtd)}</span><span class="badge">min: ${fmt(i.minimo)}</span><span class="badge">max: ${fmt(i.maximo)}</span></div></div><div class="qty">${fmt(suggestedBuy(i))}<small>sugestao</small></div></div>`}).join('')}
+function renderSectorCards(){const box=document.getElementById('sectorCards'),sectors=[...new Set(items.map(i=>i.setor||'GERAL'))].sort((a,b)=>a.localeCompare(b,'pt-BR'));if(!sectors.length){box.innerHTML='<div class="empty">Nenhum setor encontrado.</div>';return}box.innerHTML=sectors.map(sector=>{const arr=items.filter(i=>(i.setor||'GERAL')===sector),total=arr.length,zero=arr.filter(i=>getStatus(i).key==='zero').length,baixo=arr.filter(i=>getStatus(i).key==='baixo').length,crit=zero+baixo,pct=total?Math.round(crit/total*100):0;return `<div class="setorCard"><div class="setorTop"><div><div class="setorTitle">${escapeHtml(sector)}</div><div class="hint">${total} itens - ${crit} criticos</div></div><div class="setorNumber">${pct}%</div></div><div class="progress"><span style="width:${Math.min(100,pct)}%"></span></div><div class="meta"><span class="badge zero">zerados: ${zero}</span><span class="badge low">baixos: ${baixo}</span><span class="badge ok">ok: ${arr.filter(i=>getStatus(i).key==='ok').length}</span></div></div>`}).join('')}
+function exportShoppingList(){const arr=shoppingItems();if(!arr.length){alert('Nao ha itens para comprar.');return}const rows=[['setor','codigo','produto','qtd_atual','minimo','maximo','sugestao_compra','unidade','observacao'],...arr.map(i=>[i.setor,i.codigo,i.produto,i.qtd,i.minimo,i.maximo,suggestedBuy(i),i.unidade,i.observacao])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lista_de_compras.csv';a.click();URL.revokeObjectURL(a.href)}
+function setFilter(btn,f){filter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderStock()}
+function go(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');if(id==='compras')renderShoppingList();if(id==='setores')renderSectorCards();window.scrollTo({top:0,behavior:'smooth'})}
+function renderAll(){renderStats();renderSectorSelect();renderStock();renderShoppingList();renderSectorCards()}
+document.getElementById('searchStock').addEventListener('input',renderStock);document.getElementById('sectorSelect').addEventListener('change',function(){activeSector=this.value;renderStock()});loadData();
 </script>
 </body>
 </html>
