@@ -55,3 +55,17 @@ Agora envie para o GitHub:
 - pasta assets
 
 Nao precisa enviar a pasta google-apps-script para o site.
+
+
+============================================
+URL DO APPS SCRIPT ATUALIZADA
+============================================
+https://script.google.com/macros/s/AKfycbwj5eSU_eRywgZU2W1tAEPmkxpOsrwFl2qHdjA9mRrN59qwgQ2hFbbiBVIHVaOJcIqkaA/exec
+
+Use esta pasta/ZIP para substituir os arquivos do GitHub:
+- index.html
+- css/
+- js/
+- assets/
+
+A pasta google-apps-script fica apenas como backup do backend.

@@ -4,7 +4,7 @@
 // 1) Depois de publicar o Google Apps Script como Web App,
 //    cole a URL abaixo.
 // 2) Exemplo: https://script.google.com/macros/s/AKfycbx.../exec
-const API_URL = 'https://script.google.com/macros/s/AKfycbz1iQYll-ASvzM4GWgwHdajdSLtlksELApTlBK_ToVOifTZyqovalC6_BVGCnBrcfyKbA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwj5eSU_eRywgZU2W1tAEPmkxpOsrwFl2qHdjA9mRrN59qwgQ2hFbbiBVIHVaOJcIqkaA/exec';
 
 // Token opcional. Se voce preencher WRITE_TOKEN no Code.gs,
 // coloque o mesmo valor aqui. Se deixar vazio no Code.gs, deixe vazio aqui tambem.
@@ -75,16 +75,61 @@ function getStatus(item){
   return {key:'ok', label:'OK', cls:'ok'};
 }
 
-async function apiRequest(action, params = {}){
-  if(!apiConfigured()) throw new Error('API do Google Apps Script ainda nao configurada.');
-  const url = new URL(API_URL);
-  url.searchParams.set('action', action);
-  if(API_TOKEN) url.searchParams.set('token', API_TOKEN);
-  Object.entries(params).forEach(([key,value]) => url.searchParams.set(key, value ?? ''));
-  const res = await fetch(url.toString(), {method:'GET', cache:'no-store'});
-  const data = await res.json();
-  if(!data.ok) throw new Error(data.error || 'Erro desconhecido no Apps Script.');
-  return data;
+function apiRequest(action, params = {}){
+  if(!apiConfigured()){
+    return Promise.reject(new Error('API do Google Apps Script ainda nao configurada.'));
+  }
+
+  return new Promise((resolve, reject) => {
+    const callbackName = '__estoque_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const url = new URL(API_URL);
+
+    url.searchParams.set('action', action);
+    url.searchParams.set('callback', callbackName);
+    url.searchParams.set('_', Date.now());
+
+    if(API_TOKEN) url.searchParams.set('token', API_TOKEN);
+
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.set(key, value ?? '');
+    });
+
+    const script = document.createElement('script');
+    let finished = false;
+
+    function cleanup(){
+      finished = true;
+      try{ delete window[callbackName]; }catch(e){ window[callbackName] = undefined; }
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    const timer = setTimeout(() => {
+      if(finished) return;
+      cleanup();
+      reject(new Error('Tempo esgotado ao conectar com o Google Apps Script.'));
+    }, 20000);
+
+    window[callbackName] = function(data){
+      clearTimeout(timer);
+      cleanup();
+
+      if(!data || data.ok === false){
+        reject(new Error((data && data.error) ? data.error : 'Erro desconhecido no Apps Script.'));
+        return;
+      }
+
+      resolve(data);
+    };
+
+    script.onerror = function(){
+      clearTimeout(timer);
+      cleanup();
+      reject(new Error('Falha ao carregar o script do Apps Script. Verifique se o Web App esta publicado para Qualquer pessoa.'));
+    };
+
+    script.src = url.toString();
+    document.head.appendChild(script);
+  });
 }
 
 async function loadData(){
